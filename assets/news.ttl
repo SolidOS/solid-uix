@@ -1,0 +1,249 @@
+@prefix : <#>.
+@prefix bookm: <http://www.w3.org/2002/01/bookmark#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ui: <http://www.w3.org/ns/ui#> .
+@prefix schema: <http://www.schema.org/> .
+
+# :News
+#  a bookm:Topic, ui:FeedList ; 
+#  ui:label "News".
+
+:TechNews
+  a bookm:Topic; 
+  ui:label "Tech News";
+  bookm:subTopicOf :News.
+
+:ScienceNews
+  a bookm:Topic; 
+  ui:label "Science News";
+  bookm:subTopicOf :News.
+
+:GeneralNews
+  a bookm:Topic; 
+  ui:label "General News";
+  bookm:subTopicOf :News.
+
+################
+# SCIENCE NEWS #
+################
+
+[]
+  ui:label   "Nature";
+  bookm:recalls  <http://feeds.nature.com/nature/rss/current> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNewsBROKEN
+.
+[]
+  ui:label   "Smithsonian";
+  bookm:recalls  <https://www.smithsonianmag.com/rss/latest_articles/> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNews 
+.
+[]
+  ui:label   "Science";
+  bookm:recalls  <https://www.science.org/rss/news_current.xml> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNewsBROKEN
+.
+[]
+  ui:label   "New Scientist";
+  bookm:recalls  <https://www.newscientist.com/section/news/feed/> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNewsBROKEN
+.
+[]
+  ui:label   "Scientific American";
+  bookm:recalls  <http://rss.sciam.com/ScientificAmerican-Global> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNews 
+.
+[]
+  ui:label   "The State of the Planet Blog";
+  bookm:recalls  <https://news.climate.columbia.edu/feed/> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNews 
+.
+[]
+  ui:label   "SciTech Daily";
+  bookm:recalls  <https://feeds.feedburner.com/scitechdaily> ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:hasTopic :ScienceNews 
+.
+
+##############
+# TECH NEWS #
+##############
+
+[]
+  ui:label   "The Next Web";
+  bookm:recalls  <https://feeds2.feedburner.com/thenextweb> ;
+  a ui:Feed, bookm:Bookmark ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label  "Wired" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.wired.com/feed/rss> ;
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label   "Engadget";
+  bookm:recalls  <https://www.engadget.com/rss.xml> ;
+  a ui:Feed, bookm:Bookmark ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label   "Software Freedom Conservancy";
+  bookm:recalls  <https://sfconservancy.org/feeds/blog/> ;
+  a ui:Feed, bookm:Bookmark ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label   "Hacker News";
+  bookm:recalls  <https://news.ycombinator.com/rss> ;
+  a ui:Feed, bookm:Bookmark ;
+  schema:potentialAction "iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label   "The Verge";
+  bookm:recalls  <https://www.theverge.com/rss/index.xml> ;
+  a ui:Feed, bookm:Bookmark ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label   "Ars Technica";
+  bookm:recalls  <https://feeds.arstechnica.com/arstechnica/index> ;
+  a ui:Feed, bookm:Bookmark ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label  "Tech Radar" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.techradar.com/rss/news/computing> ;
+  bookm:hasTopic :TechNews 
+.
+[]
+  ui:label  "Techmeme" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.techmeme.com/feed.xml> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :TechNews 
+.
+
+################
+# GENERAL NEWS #
+################
+
+[]
+  ui:label  "Oregon Public Broadcasting" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://api.opb.arcpublishing.com/feeds/rss/?website=opb> ;
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Truthout" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.truth-out.org/feed?format=feed> ;
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "The Intercept" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://theintercept.com/feed/?lang=en> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Counterspin" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://fair.org/feed/> ;
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Democracy Now" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.democracynow.org/democracynow.rss> ;
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Informed Comment" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.juancole.com/feed/atom> ;
+  bookm:hasTopic " News" 
+.
+[]
+  ui:label  "Black America Web" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://blackamericaweb.com/category/news/feed/> ;
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "In These Times" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://inthesetimes.com/rss> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Vox" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://www.vox.com/rss/index.xml> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "ProPublica" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <http://feeds.propublica.org/propublica/main> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "CNN" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <http://rss.cnn.com/rss/edition.rss> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "UN News" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://news.un.org/feed/subscribe/en/news/all/rss.xml> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "NY Times" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://rss.nytimes.com/services/xml/rss/nyt/World.xml> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+[]
+  ui:label  "Global Voices" ;
+  a ui:Feed, bookm:Bookmark ;
+  bookm:recalls <https://globalvoices.org/feed/> ;
+  ui:needsProxy 1 ;
+  schema:potentialAction "proxy-iframe" ;  
+  bookm:hasTopic :GeneralNews 
+.
+

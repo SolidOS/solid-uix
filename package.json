@@ -1,0 +1,13 @@
+{
+  "name": "solid-uix",
+  "version": "1.0.0",
+  "description": "build no-code apps with HTML UI components",
+  "main": "src/index.js",
+  "keywords": [],
+  "author": "Jeff Zucker",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}

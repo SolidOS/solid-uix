@@ -1,0 +1,163 @@
+* {
+  font-family:Sans-Serif;
+  box-sizing: border-box;
+}
+body {
+  margin:0 !important;
+  padding:0 !important;
+  background:#99dddd !important;
+}
+
+/* SET DATABROWSER BACKGROUND FOR ALL TABLES
+   or for only the first level :  #outline > tr > td > table
+   omitting !important has interesting effects.
+*/
+#outline table {
+  background:#99dddd !important;
+}
+#userPanel select {
+  background:#99dddd !important;
+  border:1px solid #c0c0c0 !important;
+  border-radius:0.2em;
+}
+#userPanel option {
+  background:white !important;
+}
+.topBar, .topMenu, #userPanel {
+  background:#008080 !important; // teal
+}
+.page {
+  display:grid;
+  grid-template-columns: 48ch auto;
+}
+#userPanel {
+  padding-left:1rem;
+  padding-right:0;
+}
+#userPanel b {
+  opacity:50% !important;
+}
+#userPanel button {
+//  margin-left:1rem;
+  opacity:70% !important;
+}
+#userPanel textarea {
+  height:4rem;
+  border:1px solid  #7C4DFF;
+  boder-radius:0.2rem !important;
+  padding-left:1rem;
+  padding-right:1rem;
+}
+#userPanel select {
+  font-size:95%;
+  border:1px solid  #7C4DFF;
+  boder-radius:0.2rem !important;
+  padding:0.5rem;
+  width:40ch;
+}
+
+
+/** BANNER
+*/
+.banner {
+  display:grid;
+  grid-template-columns:110px auto 110px;
+}
+.banner img {
+  height:110px;
+  width:110px;
+}
+
+.podOwnerDescription {
+  text-align:center;
+  margin-right:1rem;
+}
+
+.topBar {
+  height:2rem;
+}
+
+div[data-uiv="solidLogin"] {
+  position:absolute;
+  left:3rem;
+}
+
+img[data-uiv="solidLogo"] {
+  height:110px;
+  width:110px;
+  position:absolute;
+//  background: white !important;
+//  right:1rem;
+  left:0;
+  top:2rem;
+//  top:0;
+}
+#loading {
+  font-size:200%;
+  margin:12rem;
+}
+/* BANNER
+*/
+.banner h2 {
+  padding:1rem;
+  padding-bottom:0.5rem;
+  margin:0;
+}
+div[data-uiv="solidLogin"] input,
+.podOwnerMenu a, .podOwnerMenu button, #userPanel a, #userPanel button  {
+  border-radius:0.2rem;
+//  border:1px solid #7C4DFF;
+  border:1px solid white;
+  padding:0.4rem;
+  text-decoration:none;
+  margin-right:1rem;
+  cursor:pointer;
+  background: white !important;
+  color: #7C4DFF; !important;
+  background: transparent !important;
+  color: white; !important;
+  font-size:100% !important;
+  display:inline-block;
+}
+div[data-uiv="solidLogin"] input {
+//  background: transparent !important;
+  margin:0;
+  color: white !important;
+  padding:0.4rem !important;
+  border-radius:0.2rem !important;
+}
+
+.banner a:hover, .banner button:hover,
+#userPanel a:hover, #userPanel button:hover {
+  background: #7C4DFF;
+  color:white !important;
+}
+
+
+.topMenu button, .topMenu a {
+  border:1px solid white;
+}
+.topMenu {
+  text-align:center;
+  padding:0.5rem;
+  height:3rem;
+}
+
+#userMenuToggle {
+  background:transparent !important;
+  border:none;
+  position:absolute;
+  left:10px;
+  display:inline-block;
+  padding:0;
+//  margin-top:0;
+  margin-top:-0.5rem !important;
+  color:white !important;
+  font-size:240% !important;
+  font-weight:bold;
+  opacity:50%;
+}
+
+.hidden {
+  display:none;
+}

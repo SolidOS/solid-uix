@@ -1,0 +1,112 @@
+.solid-uic-dropdown-menu {
+  position:absolute;
+  top:0;
+}
+
+.solid-uic-dropdown-menu *, 
+.solid-uic-dropdown-menu *:before, 
+.solid-uic-dropdown-menu *:after {
+  font-family:Sans-Serif;
+  box-sizing: inherit;
+} 
+.solid-uic-dropdown-menu ul {
+  Padding: 0;
+  margin: 0;
+  list-style: none;
+  position: relative;
+}
+.solid-uic-dropdown-menu ul li {
+  display:inline-block;
+  z-index:10001;
+}
+.solid-uic-dropdown-menu ul ul {
+  display: none;
+  position: absolute; 
+  top: 40px; 
+}
+.solid-uic-dropdown-menu .main, h2 {
+  text-align:left;
+}
+.solid-uic-dropdown-menu h2 {
+  font-size:1.4rem;
+  padding-left:1rem;
+}
+.solid-uic-dropdown-menu .leftColumn {
+  padding-left:1rem;
+}
+.solid-uic-dropdown-menu button {
+//  background:"transparent";
+}
+.solid-uic-dropdown-menu button.selected, button:hover {
+//  background:"#ddd";
+}
+/*
+.solid-uic-dropdown-menu li > a:after { content:  ' ▼'; }
+.solid-uic-dropdown-menu li > a:only-child:after { content: ''; }
+.solid-uic-dropdown-menu li > span:after { content:  ' ▼'; font-size:0.85em;}
+.solid-uic-dropdown-menu li > span:after { content:  ' &#9660;'; font-size:0.85em;}
+.solid-uic-dropdown-menu li > span:only-child:after { content: ''; }
+*/
+.solid-uic-dropdown-menu li > span {
+  margin-right:0.5rem;
+  margin-left:0.5rem;
+}
+.solid-uic-dropdown-menu ul li:hover > ul {
+  display:block;
+}
+.solid-uic-dropdown-menu ul ul li {
+  width:230px !important;
+  float:none;
+  display:list-item;
+  position: relative;
+  text-align:center;
+  z-index:10001;
+}
+.solid-uic-dropdown-menu ul ul ul li {
+  position: relative;
+  top:-40px; 
+  left:230px;
+  z-index:10001;
+}
+.solid-uic-dropdown-menu ul ul li {
+  border: 1px solid white;
+}
+
+
+.solid-uic-dropdown-menu ul, 
+.solid-uic-dropdown-menu ul li {
+}
+.solid-uic-dropdown-menu  span { 
+  display:inline-block;width:100%; }
+
+.leftColumn button.selected {
+  background:#083575; 
+}
+.leftColumn button:hover {
+  background:#6d8ecb;
+}
+
+.uic-accordion DIV:hover { 
+  background: #6d8ecb;
+}
+.uic-accordion DIV.selected { 
+   background:#083575; 
+}
+
+.solid-uic-dropdown-menu span:hover { 
+}
+.solid-uic-dropdown-menu span {
+  display:inline-block;
+//  padding:0.20rem;
+//  font-size:1rem;
+  line-height: 40px;
+  text-decoration:none;
+}
+.solid-uic-dropdown-menu > ul > li > span {
+}
+.solid-uic-dropdown-menu .nested .item {
+  display:block !important;
+}
+.solid-uic-dropdown-menu .item {
+  padding:0 !important;
+}
