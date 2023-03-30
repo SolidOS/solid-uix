@@ -4,7 +4,7 @@
 
 The Solid UIX framework supports low and no-code building of Solid apps and websites by embedding simple tags in HTML.  Sites and apps built with Solid UIX are easy to make language independent and support a symbiotic division of labor between those who manage data and those who present it to the public.
 
-Please see this demo, a [complete reimagining of the SolidOS frontend](https://jeff-zucker.github.io/solid-uix/) for an example app built entirely with Solid UIX.
+Please see this demo, a [complete reimagining of the SolidOS frontend](https://jeff-zucker.github.io/solid-uix/index.html) for an example app built entirely with Solid UIX.
 
 ## Basic Usage
 
@@ -48,27 +48,37 @@ UIX variables can reference the owner of the pod being visited, the logged-in us
    ></b>
 ```
 
-### HTML classes
+## Queries
 
-The only required HTML class is ".hidden" which must be defined as "display:none" in a stylesheet.  All other classes are entirely optional - use them for other  purposes as needed, they do not impact the operation of UIX.
+More docs coming soon, here's the TL;DR ...
 
-### HTML ids
+This runs a store.each using the specified values
 
-There are only three HTML ids recognized by UIX.
+```html
+<select id="myTopicSelector"
+       data-uiq = "* a bk:Topic"
+    data-source = "/public/s/solid-uix/news.ttl"
 
-* #loading : `<div id="loading"> any label or image </div>`
-* #userMenuToggle : `<button id="userMenuToggle"> any label or image </button>`
-* #userPanel : `<div id="userPanel" class="hidden"> any private content </div>`
+></select>
+```
 
-If a loading div is included in a page, it will be displayed and removed as approprite during loading of data.
+This takes the value of the previously shown select and uses it as a parameter in a query :
 
-If there are both a *#userMenuToggle* button and a *userMenuPanel* div included in a page, the button will only be clickable when the user is logged in and the div will only be visible to the logged-in user when the button toggles it on.
+```html
+<select id="myCollectionSelector"
+             data-uiq = "* bk:hasTopic ?"
+          data-source = "/public/s/solid-uix/news.ttl"
+       data-paramFrom = "#myTopicSelector"
+></select>
+```
 
-The userPanel should always have the class hidden in its tag.
 
-**Note** A user's private pod data is never displayed unless logged in.  The *hidden* class is useful for a clean display but omitting it will not reveal user's private pod data.
+## Actions
 
-## Not yet complete ... more coming soon.
+More docs coming soon, here's the TL;DR ...
+
+* buttons can automatically submit the value of the closest select
+* selects can fire actions in other components
 
 
 &copy; Jeff Zucker, 2023 all rights reserved; May be freely distributed under an MIT license.
