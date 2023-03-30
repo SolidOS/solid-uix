@@ -1,98 +1,86 @@
 <!DOCTYPE html><html>
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type">
-</head><body>
+</head><body style="display:none">
 
 <div class="topBar"></div>
 
-
 <div class="banner">
-
     <span><img data-uiv="solidLogo" /></span>
-
     <div class="podOwnerPanel">       
         <div class="podOwnerDescription">
-          <h2 data-uiv="podOwnerName"></h2>
-          <div data-uiv="podOwnerRole"></div>
-          <div data-uiv="podOwnerPronouns"></div>
+            <h2 data-uiv="podOwnerName"></h2>
+            <div data-uiv="podOwnerRole"></div>
+            <div data-uiv="podOwnerPronouns"></div>
         </div>
     </div>
-
     <img data-uiv="podOwnerPhoto" />
-
 </div>
 
 <div class="topMenu">
-
-        <span id="userMenuToggle">&equiv;</span>
-
-        <div data-uiv="solidLogin"></div>
-        <div class="podOwnerMenu">
-
-            <a data-uiv="podOwnerHome">Home</a> 
-
-            <a href="" data-uiv="podOwnerWebid">Profile</a>
-
-            <a data-uiv="podOwnerInstances"
-                    data-where="vcard:AddressBook"
-            >Address Book</a>
-
-            <a data-uiv="podOwnerInstances"
-                    data-where="<http://www.w3.org/2005/01/wf/flow#Tracker>"
-            >Roadmap</a>
-
-            <a data-uiv="podOwnerInstances"
-                    data-where="<http://www.w3.org/ns/pim/meeting#LongChat>"
-            >Chat with me!</a>
-
-
-        </div>
+    <span id="userMenuToggle">&equiv;</span>
+    <div data-uiv="solidLogin"></div>
+    <div class="podOwnerMenu">
+        <a data-uiv="podOwnerHome">Home</a> 
+        <a href="" data-uiv="podOwnerWebid">Profile</a>
+        <a data-uiv="podOwnerInstances"
+           data-where="vcard:AddressBook"
+        >Address Book</a>
+        <a data-uiv="podOwnerInstances"
+           data-where="<http://www.w3.org/2005/01/wf/flow#Tracker>"
+        >Roadmap</a>
+        <a data-uiv="podOwnerInstances"
+           data-where="<http://www.w3.org/ns/pim/meeting#LongChat>"
+        >Chat with me!</a>
+    </div>
 </div>
 
-<div class="page">                <!-- PAGE -->
-                       
-<div id="userPanel" class="hidden">  <!-- PANEL -->
-<p><b> my storages </b><br />     <select data-uiv="userStorages"></select>
-                                  <button data-uiv="submit">go</button>
+<div class="page">
+    <div id="userPanel" class="hidden">
+        <p> <b> my storages </b><br />
+            <select data-uiv="userStorages"></select>
+            <button data-uiv="submit">go</button>
+        </p>
+        <p> <b>my friends</b><br />
+            <select data-uiv="userFriends"></select>
+            <button data-uiv="submit">go</button>
+        </p>
+        <p><b>my communities</b><br />
+            <select data-uiv="userCommunities"></select>
+            <button data-uiv="submit">go</button>
+        </p>
+        <p><b>my tools</b><br />
+            <select data-uiv="userInstances"></select>  
+            <button data-uiv="submit">go</button>
+        </p>
+        <p><b> my issuers </b><br />
+          <ul data-uiv="userIssuers"></ul>
+        </P>
+    </div>
+    <div class="content">
+        <div id="notificationArea">
+<p>Welcome to a modular SolidOS front-end. Take it for a spin, being sure to notice that the center menu relates to the person you are visiting while the left-hand menu (after logging in, click the &equiv;) relates to you.  Visit a friend and see!
+</p><p>
+Then look at view source of this page.  You'll see this is a zero-code app.  Everything is loaded using simple HTML tags. To find out more check out the WiP 
+<a href="https://github.com/jeff-zucker/solid-uix/">Solid UIX repo</a>.
 </p>
-<p><b>my friends</b><br />        <select data-uiv="userFriends"></select>
-                                  <button data-uiv="submit">go</button>
-</p>
-<p><b>my communities</b><br />    <select data-uiv="userCommunities"></select>
-                                  <button data-uiv="submit">go</button>
-</p>
-<p><b>my tools</b><br />          <select data-uiv="userInstances"></select>  
-                                  <button data-uiv="submit">go</button>
-</p>
-<!--
-<p><b> my issuers </b><br />      <ul data-uiv="userIssuers"></ul>
--->
+</div>
+        <div data-uiv="solidOSbrowser"></div>
+    </div>
+</div>
+<meta id="uriField" />
 
-</div>                            <!-- end of panel -->
-                                  <!-- content -->
-<div class="content">             <div data-uiv="solidOSbrowser"></div>
+<!-- just imported libraries below here, nothing to see -->
 
-<div id="loading"> loading ... </div>
-<!--
-    <select data-uiv="podOwnerInstances"
-       data-owner="https://solidproject.solidcommunity.net/profile/card#me"
-    ></select>
-    <select data-uiv="podOwnerInstances"
-       data-owner="https://solidos.solidcommunity.net/profile/card#me"
-    ></select>
--->
+<script src="https://solidos.github.io/mashlib/dist/mashlib.js" type="module">
+</script>
+<script type="module"> 
+    import {UIX} from './src/uix-core.js';
+    document.addEventListener('DOMContentLoaded', ()=>{
+        (new UIX()).init();
+    });
+</script>
+<link rel="stylesheet" href="assets/uix.css">
+<link rel="stylesheet" href="https://solidos.github.io/mashlib/dist/mash.css">
 
-</div>                            <!-- end of page -->
-
-<!-- just boilerplate below here, always include this -->
-
-    <link rel="stylesheet" href="assets/uix.css">
-    <link rel="stylesheet" href="https://solidos.github.io/mashlib/dist/mash.css">
-    <script src="https://solidos.github.io/mashlib/dist/mashlib.js" type="module"></script>
-
-    <script type="module"> 
-        import {UIX} from './src/uix-core.js';
-        document.addEventListener('DOMContentLoaded', ()=>{
-            (new UIX()).init();
-        });
-    </script>
+</body>

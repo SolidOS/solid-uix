@@ -10,15 +10,14 @@ export class UIX {
     this.initLogin = initLogin.bind(this);
   }
   async init(){
+    let loading = document.getElementById('loading');
+    if(loading) loading.style.display="none";
     await this.profileSession.initActors();
-    const uriField = document.getElementById('uriField');
-    this.podOwner = uriField ?uriField.value :null;
     await this.initLogin();
     await this.initVariables();
     await this.initQueries();
-    let loading = document.getElementById('loading');
-    if(loading) loading.style.display="none";
-    util.toggleUserPanel();
+    util.toggleUserPanel(this.podOwner);
+    document.body.style.display="block";
   }
   async showInElement(actionElement,output){
     const self = this;

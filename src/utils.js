@@ -72,9 +72,11 @@ export function getNodeFromFieldValue(fieldSelector,key){
 }
 
 
-export function toggleUserPanel(){
+export function toggleUserPanel(podOwner){
     const userPanel = document.getElementById('userPanel');
     const menuToggle = document.getElementById('userMenuToggle');
+    const ownerMenu = document.querySelector('.podOwnerMenu');
+    ownerMenu.style.display = podOwner ?"block" :"none";   
     if(!userPanel || !menuToggle) return;
     const user = UI.authn.currentUser();
     if(user) {

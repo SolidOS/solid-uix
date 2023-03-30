@@ -20,6 +20,9 @@ body {
   border:1px solid #c0c0c0 !important;
   border-radius:0.2em;
 }
+#notificationArea {
+  margin:2rem;
+}
 #userPanel option {
   background:white !important;
 }
