@@ -16,11 +16,6 @@ body {
   background:#99dddd !important;
 }
 
-#userPanel select {
-  background:#99dddd !important;
-  border:1px solid #c0c0c0 !important;
-  border-radius:0.2em;
-}
 #notificationArea {
   margin:2rem;
 }
@@ -32,7 +27,7 @@ body {
 }
 .page {
   display:grid;
-  grid-template-columns: 48ch auto;
+  grid-template-columns: 46ch auto;
 }
 #userPanel {
   padding-left:1rem;
@@ -51,10 +46,15 @@ body {
   padding-left:1rem;
   padding-right:1rem;
 }
+#userPanel a {
+  display:inine-block;
+  margin-top:1rem;
+}
 #userPanel select {
+  background:#99dddd !important;
+  border:1px solid #c0c0c0 !important;
+  border-radius:0.2em;
   font-size:95%;
-  border:1px solid  #7C4DFF;
-  boder-radius:0.2rem !important;
   padding:0.5rem;
   width:40ch;
 }
@@ -120,7 +120,7 @@ div[data-uiv="solidLogin"] input,
 
 .banner a:hover, .banner button:hover,
 #userPanel a:hover, #userPanel button:hover {
-  background: white;
+  background: white !important;
   color:teal !important;
 }
 .topMenu button, .topMenu a {

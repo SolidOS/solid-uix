@@ -104,7 +104,7 @@ function getShortcut(self,req,element){
       const where = (util.string2node(element.dataset.where)||{}).value;
       if(!where ||(where && where===classObj.value)){
         let instance = UI.store.any(i.subject,UI.ns.solid('instance'),null,pti);
-        instanceArray.push({label:util.bestLabel(classObj),link:instance.value,forClass:classObj.value});
+        if(instance) instanceArray.push({label:util.bestLabel(classObj),link:instance.value,forClass:classObj.value});
       }
     }
     return instanceArray;
@@ -116,21 +116,8 @@ export async function harvestProfile(webid) {
   if(wantedUser.error) { alert(wantedUser.error); return; }
   if(wantedUser.publicTypeIndex) await _tryLoad(wantedUser.publicTypeIndex);
   if(wantedUser.privateTypeIndex) await _tryLoad(wantedUser.privateTypeIndex);
-  if(wantedUser.preferences) await _tryLoad(wantedUser.preferences);
-return wantedUser;
-  return function(requestString){
-     if(requestString.match('webid')) return wantedUser.webid;
-     else if(requestString.match('instances')){
-       let instanceArray = [];
-       let instances = UI.store.match(null,UI.ns.solid('instance') );
-       for(let instance of instances){
-         let iclass = (UI.store.any(instance.subject,UI.ns.solid('forClass'))||{}).value;
-         instanceArray.push({class:iclass,instance:instance.object.value});
-       }
-       return instanceArray;
-     }
-     else return _getProperties(wantedUser.webid,requestString) || "";
-  }
+  if(wantedUser.preferencesFile) await _tryLoad(wantedUser.preferencesFile);
+  return wantedUser;
 }
 
 async function constructContext(webidString){
@@ -152,11 +139,11 @@ async function constructContext(webidString){
       context.error = `Could not load ${context.publicProfile}`;
     }
     context.publicTypeIndex = _getProperty(context.webid,'solid:publicTypeIndex');
-    context.privateTypeIndex = _getProperty(context.webid,'solid:privateTypeIndex');
-    if(context.isOwner){
-      context.preferencesFile= _getProperty(context.webid,'space:preferencesFile');
-      context.index.private = _getProperty(context.webid,'solid:privateTypeIndex');
-    }
+//    if(context.isOwner){
+      context.preferencesFile =  _getProperty(context.webid,'space:preferencesFile');
+      context.privateTypeIndex = _getProperty(context.webid,'solid:privateTypeIndex');
+
+//    }
     return context;
   }
 }

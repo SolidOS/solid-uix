@@ -15,14 +15,15 @@ export class UIX {
     await this.profileSession.initActors();
     await this.initLogin();
     await this.initVariables();
+    await this.initActions();
     await this.initQueries();
     util.toggleUserPanel(this.podOwner);
     document.body.style.display="block";
   }
   async showInElement(actionElement,output){
     const self = this;
-    let actionVerb = ((actionElement.dataset.uiv)||"").toLowerCase() 
-                  || ((actionElement.dataset.uiq)||"").toLowerCase() ;
+    let opt = actionElement.dataset;
+    let actionVerb=((opt.uiv)||"").toLowerCase()||((opt.uiq)||"").toLowerCase();
     switch(actionElement.tagName) {
       case 'IMG':
           actionElement.src = output;
@@ -62,6 +63,13 @@ export class UIX {
               this.showSolidOSlink(e.target.href,actionElement);
             });
           }
+          break;
+      case 'DL' :
+            let outer = opt.uiv;
+            let inner = opt.loop;
+            outer = await <dl data-uiv="userCommunities"
+                data-loop="podOwnerInstances"
+            ></dl>  
           break;
       case 'SELECT' :
           if(actionElement.options){
@@ -108,7 +116,7 @@ export class UIX {
  */
 async showSolidOSlink(subject,element){
   const opt = element.dataset || {};
-  const isPodAction = opt.uiv.match(/^podOwner/i);
+  const isPodAction = opt.uiv && opt.uiv.match(/^podOwner/i);
   if(!subject) return console.log("No subject supplied for SolidOSLink!");
   subject = subject.uri ?subject :UI.rdf.sym(subject);
   const o = panes.getOutliner(opt.dom || document);
@@ -116,7 +124,8 @@ async showSolidOSlink(subject,element){
   if(podOwner && !isPodAction){
     this.refreshPodOwner(podOwner);
   }
-  await o.GotoSubject(subject,true,opt.wantedPane,true,null,opt.outlineElement);
+  let pane = opt.pane ?panes.byName(opt.pane) :null;
+  await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
 }  
   async refreshPodOwner(podOwner){
     if(this.podOwner===podOwner.webid) return;
@@ -126,6 +135,13 @@ async showSolidOSlink(subject,element){
       if(actionElement.dataset.uiv.match(/^podOwner/i)){
          await this.processVariable(actionElement);
       }
+    }
+  }
+  async initActions(elementToInit){
+    elementToInit ||= document.body;
+    let actionElements = elementToInit.querySelectorAll('[data-uia]') || [];
+    for(let actionElement of actionElements){
+         await this.processAction(actionElement);
     }
   }
   async initVariables(elementToInit){
@@ -159,7 +175,7 @@ async showSolidOSlink(subject,element){
     };
     if(actors.owner) actors.owner = await this.profileSession.init(actors.owner);
     if(actors.user) actors.user = await this.profileSession.init(actors.user);
-    const v = actionVerb.toLowerCase();
+    let v = actionVerb.toLowerCase();
     if(v.match(/^(edit|add)/)) v = 'user'+v;
     if(v.match(/^podowner/))output = interpolateVariable.owner(v,element,actors);
     if(v.match(/^user/)) output = interpolateVariable.user(v,element,actors);
@@ -180,7 +196,27 @@ async showSolidOSlink(subject,element){
     }
     if(matches) await this.showInElement(element,matches)
   }
-
+  async processAction(element){
+    let action = element.dataset.uia;
+    let user = UI.authn.currentUser();
+    let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action.startsWith('edit')){
+      if(!user) return;
+      user = await this.profileSession.init(user);
+      let subject,pane;
+      if(action==='editProfile'){
+        subject = user.context.webid.value;
+        pane = 'editProfile';
+      }
+      else if(action==='editPreferences'){
+        subject = user.context.preferencesFile.value;
+        pane = 'basicPreferences';
+      }
+      element.addEventListener(eventType,()=> {
+        this.showSolidOSlink(subject,{dataset:{pane}});
+      });
+    }
+  }
 }
 
 

@@ -17,7 +17,9 @@ user: (variableName,callingElement,actors)=>{
   if(!loggedInUser){
     return console.log(`No logged in user , can't show user variable'${variableName}'`);
   }
-  return loggedInUser.prop(variableName,callingElement);
+  else {
+    return loggedInUser.prop(variableName,callingElement);
+  }
 },
 
 solid: (variableName,callingElement)=>{

@@ -37,25 +37,34 @@
 
 <div class="page">
     <div id="userPanel" class="hidden">
+
         <p> <b> my storages </b><br />
             <select data-uiv="userStorages"></select>
-            <button data-uiv="submit">go</button>
-        </p>
-        <p> <b>my friends</b><br />
-            <select data-uiv="userFriends"></select>
-            <button data-uiv="submit">go</button>
-        </p>
-        <p><b>my communities</b><br />
-            <select data-uiv="userCommunities"></select>
             <button data-uiv="submit">go</button>
         </p>
         <p><b>my tools</b><br />
             <select data-uiv="userInstances"></select>  
             <button data-uiv="submit">go</button>
         </p>
-        <p><b> my issuers </b><br />
-          <ul data-uiv="userIssuers"></ul>
-        </P>
+        <p><b>my community tools</b><br />
+            <dl data-uiv="userCommunities"
+              data-loop="podOwnerInstances"
+            ></dl>  
+            <button data-uiv="submit">go</button>
+        </p>
+        <p><b>my communities</b><br />
+            <select data-uiv="userCommunities"></select>
+            <button data-uiv="submit">go</button>
+        </p>
+        <p> <b>my friends</b><br />
+            <select data-uiv="userFriends"></select>
+            <button data-uiv="submit">go</button>
+        </p>
+        <p style="text-align:center">
+          <a data-uia="editProfile">edit profile</a>
+          <a data-uia="editPreferences">edit preferences</a>
+        </p>
+        
     </div>
     <div class="content">
         <div id="notificationArea">
