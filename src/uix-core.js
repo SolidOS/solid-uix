@@ -67,9 +67,12 @@ export class UIX {
       case 'DL' :
             let outer = opt.uiv;
             let inner = opt.loop;
-            outer = await <dl data-uiv="userCommunities"
-                data-loop="podOwnerInstances"
-            ></dl>  
+            for(let row of output){
+              let dt = document.createElement('DT');
+              dt.innerHTML = row.label || row;
+              actionElement.appendChild(dt);
+            }
+            console.log(output); //outer = await <dl data-uiv="userCommunities"
           break;
       case 'SELECT' :
           if(actionElement.options){
