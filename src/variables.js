@@ -8,7 +8,7 @@ owner: (variableName,callingElement,actors)=>{
   if(!podOwner){
     return console.log(`Can't find pod owner or show variable '${variableName}'`);
   }
-  return podOwner.prop(variableName,callingElement);
+  return podOwner.get(variableName,callingElement);
 },
 
 user: (variableName,callingElement,actors)=>{
@@ -18,7 +18,7 @@ user: (variableName,callingElement,actors)=>{
     return console.log(`No logged in user , can't show user variable'${variableName}'`);
   }
   else {
-    return loggedInUser.prop(variableName,callingElement);
+    return loggedInUser.get(variableName,callingElement);
   }
 },
 

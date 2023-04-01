@@ -8,6 +8,29 @@ body {
   background:#99dddd !important;
 }
 
+#helpMenu {
+  position:absolute;
+  right:0.5rem;
+  top:116px;
+  display:inline-block;
+  text-align:right !important;
+}
+#helpMenu button {
+  cursor:pointer;
+  background:transparent;
+  color:white;
+  font-size:150%;
+  font-weight:bold;
+  border:none;
+}
+#helpMenu a {
+  width:20ch;
+  display:block;
+  padding:0.5rem;
+  background:teal;
+  color:white;
+}
+
 /* SET DATABROWSER BACKGROUND FOR ALL TABLES
    or for only the first level :  #outline > tr > td > table
    omitting !important has interesting effects.
@@ -93,11 +116,9 @@ div[data-uiv="solidLogin"] input {
   border-radius:0.2rem !important;
 }
 img[data-uiv="solidLogo"] {
-  height:110px;
-  width:110px;
-  position:absolute;
-  left:0;
-  top:2rem;
+  height:100px;
+  width:100px;
+  margin-top:5px;
 }
 .banner h2 {
   padding:1rem;
@@ -118,6 +139,8 @@ div[data-uiv="solidLogin"] input,
   display:inline-block;
 }
 
+div[data-uiv="solidLogin"] input:hover,
+.topMenu a:hover, .topMenu button:hover,
 .banner a:hover, .banner button:hover,
 #userPanel a:hover, #userPanel button:hover {
   background: white !important;

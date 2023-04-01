@@ -123,7 +123,7 @@ async showSolidOSlink(subject,element){
   if(!subject) return console.log("No subject supplied for SolidOSLink!");
   subject = subject.uri ?subject :UI.rdf.sym(subject);
   const o = panes.getOutliner(opt.dom || document);
-  let podOwner = await this.profileSession.init(subject.uri);
+  let podOwner = await this.profileSession.add(subject.uri);
   if(podOwner && !isPodAction){
     this.refreshPodOwner(podOwner);
   }
@@ -165,7 +165,7 @@ async showSolidOSlink(subject,element){
     if(typeof element==="string") element = document.getElementById(element.replace(/^#/,''));
     if(!element.dataset) return;
     if(element.dataset.uiv) return this.processVariable(element);
-    else if(element.dataset.uiq) return this.processQuery(element,7);
+    else if(element.dataset.uiq) return this.processQuery(element);
     else console.log("Non-actionable-element - " + element.id || element.tagName);
   }
   async processVariable(element){
@@ -176,8 +176,8 @@ async showSolidOSlink(subject,element){
       user: UI.authn.currentUser(),
       owner: specifiedOwner || this.podOwner,
     };
-    if(actors.owner) actors.owner = await this.profileSession.init(actors.owner);
-    if(actors.user) actors.user = await this.profileSession.init(actors.user);
+    if(actors.owner) actors.owner = await this.profileSession.add(actors.owner);
+    if(actors.user) actors.user = await this.profileSession.add(actors.user);
     let v = actionVerb.toLowerCase();
     if(v.match(/^(edit|add)/)) v = 'user'+v;
     if(v.match(/^podowner/))output = interpolateVariable.owner(v,element,actors);
@@ -203,9 +203,34 @@ async showSolidOSlink(subject,element){
     let action = element.dataset.uia;
     let user = UI.authn.currentUser();
     let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action==='toggleVisibility'){
+      element.addEventListener('click',async(e)=> {
+        e.preventDefault();
+        let button = e.target;
+        let target = button.dataset.target || button.nextSibling.nextSibling;
+        target.classList.toggle('hidden');
+      });
+    }
+    if(action==='dropdown'){
+      element.addEventListener('mouseover',async(e)=> {
+        e.preventDefault();
+        let button = e.target;
+        let target = button.nextSibling.nextSibling;
+        target.style.display="block";
+        target.addEventListener('mouseover',async(e)=> {
+          target.style.display="block";
+        });
+        target.addEventListener('mouseout',async(e)=> {
+          target.style.display="none";
+        });
+        document.body.addEventListener('click',async(e)=> {
+          target.style.display="none";
+        });
+      });
+    }
     if(action.startsWith('edit')){
       if(!user) return;
-      user = await this.profileSession.init(user);
+      user = await this.profileSession.add(user);
       let subject,pane;
       if(action==='editProfile'){
         subject = user.context.webid.value;
