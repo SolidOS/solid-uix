@@ -49,6 +49,7 @@ export class UIX {
             actionElement.style.display="none";
           }
           else {
+            actionElement.style.display="inline-block";
             actionElement.href = output;
             actionElement.addEventListener('click',async(e)=> {
               e.preventDefault();
@@ -126,26 +127,35 @@ export class UIX {
     if(!subject) return console.log("No subject supplied for SolidOSLink!");
     subject = subject.uri ?subject :UI.rdf.sym(subject);
     const o = panes.getOutliner(opt.dom || document);
-    let podOwner = await this.profileSession.add(subject.uri);
-//    this.refreshPodOwner(podOwner,element);
-    this.refreshPodOwner(subject,element);
+    await this.refreshPodOwner(subject.uri,element);
     let pane = opt.pane ?panes.byName(opt.pane) :null;
-    await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
+    o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
   }  
 
-  async refreshPodOwner(podOwner,element){
-    const isPodAction = element.dataset.uix && element.dataset.uix.match(/^podOwner/i);
-    if(!podOwner || isPodAction || this.podOwner===podOwner.webid) return;
-    let newPath = (new URL(podOwner.value)).host;
-    for(let p of Object.keys(this.profileSession.visited)){
-      let existingPath = (new URL(p.webid)).host;
-    }
-    alert(newPath+"=="+existingPath);
-//    this.podOwner = podOwner.webid;
-    this.podOwner = podOwner.value;
+  async refreshPodOwner(webid,element){
+    /** 
+         Refresh the podOwner areas: name,role,pronouns,photo,podOwnerMenu
+         But only when needed
+    **/
+    const action = element && element.dataset ?element.dataset.uix :"";
+    const isPodAction = action.match(/^podOwner/i);
+    const isUserAction = action.match(/^user/i) && !action.match(/(communities|friends)/i);
+    const user = UI.authn.currentUser().value;
+    this.podOwner ||= user;
+    if(!webid) return;                // no new owner, so no refresh
+    if(isPodAction) return;           // action is by existing podOwner, so no refresh
+    if(isUserAction) webid=user;
+    if(webid===this.podOwner) return; // new owner is already pod owner, so no refresh
+    /**
+       Okay, let's refresh
+    **/
+    this.podOwner = webid;
     let actionElements = document.body.querySelectorAll('[data-uix]') || [];
     for(let actionElement of actionElements){
-      if(actionElement.dataset.uix.match(/^podOwner/i)){
+      let act = actionElement.dataset.uix;
+      if(act.match(/^podOwner/i)){
+        if(act.match(/(name|pronouns|role)/i)) actionElement.innerHTML="";
+        if(act.match(/photo/i)) actionElement.src="";
         await this.process(actionElement);
       }
     }
@@ -154,7 +164,7 @@ export class UIX {
     elementToInit ||= document.body;
     let actionElements = elementToInit.querySelectorAll('[data-uix]') || [];
     for(let actionElement of actionElements){
-         await this.process(actionElement);
+      await this.process(actionElement);
     }
   }
 
