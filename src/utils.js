@@ -61,8 +61,6 @@ export async function string2statement(querystring,source,param){
    return matches;
 }
 
-
-
 export function getNodeFromFieldValue(fieldSelector,key){
    let paramField = document.getElementById( fieldSelector.replace(/^#/,'') );
    if(!paramField ) return;
@@ -71,12 +69,11 @@ export function getNodeFromFieldValue(fieldSelector,key){
    catch(e){ console.log(e) }
 }
 
-
 export function toggleUserPanel(podOwner){
     const userPanel = document.getElementById('userPanel');
     const menuToggle = document.getElementById('userMenuToggle');
     const ownerMenu = document.querySelector('.podOwnerMenu');
-    ownerMenu.style.display = podOwner ?"block" :"none";   
+    if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
     if(!userPanel || !menuToggle) return;
     const user = UI.authn.currentUser();
     if(user) {

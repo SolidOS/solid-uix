@@ -11,7 +11,7 @@ body {
 #helpMenu {
   position:absolute;
   right:0.5rem;
-  top:116px;
+  top:120px;
   display:inline-block;
   text-align:right !important;
 }
@@ -42,25 +42,17 @@ body {
 #notificationArea {
   margin:2rem;
 }
-#userPanel option {
-  background:white !important;
-}
+
 .topBar, .topMenu, #userPanel {
   background:#008080 !important; // teal
 }
 .page {
   display:grid;
   grid-template-columns: 46ch auto;
+  height:100%;
 }
 #userPanel {
-  padding-left:1rem;
-  padding-right:0;
-}
-#userPanel b {
-  opacity:50% !important;
-}
-#userPanel button {
-  opacity:70% !important;
+  padding:1rem;
 }
 #userPanel textarea {
   height:4rem;
@@ -70,24 +62,15 @@ body {
   padding-right:1rem;
 }
 #userPanel a {
-  display:inine-block;
-  margin-top:1rem;
+  color:black !important;
+  border:1px solid black !important;
 }
-#userPanel select {
-  background:#99dddd !important;
-  border:1px solid #c0c0c0 !important;
-  border-radius:0.2em;
-  font-size:95%;
-  padding:0.5rem;
-  width:40ch;
-}
-
 #loading {
   font-size:200%;
   margin:12rem;
 }
 .topBar {
-  height:2rem;
+  height:2.5rem;
 }
 
 /** BANNER
@@ -105,17 +88,17 @@ body {
   margin-right:1rem;
 }
 
-div[data-uiv="solidLogin"] {
+div[data-uix="solidLogin"] {
   position:absolute;
   left:3rem;
 }
-div[data-uiv="solidLogin"] input {
+div[data-uix="solidLogin"] input {
   margin:0;
   color: white !important;
   padding:0.4rem !important;
   border-radius:0.2rem !important;
 }
-img[data-uiv="solidLogo"] {
+img[data-uix="solidLogo"] {
   height:100px;
   width:100px;
   margin-top:5px;
@@ -125,7 +108,7 @@ img[data-uiv="solidLogo"] {
   padding-bottom:0.5rem;
   margin:0;
 }
-div[data-uiv="solidLogin"] input,
+div[data-uix="solidLogin"] input,
 .podOwnerMenu a, .podOwnerMenu button, #userPanel a, #userPanel button  {
   border-radius:0.2rem;
   border:1px solid white;
@@ -139,8 +122,9 @@ div[data-uiv="solidLogin"] input,
   display:inline-block;
 }
 
-div[data-uiv="solidLogin"] input:hover,
-.topMenu a:hover, .topMenu button:hover,
+div[data-uix="solidLogin"] input:hover,
+.podOwnerMenu a:hover, .podOwnerMenu button:hover,
+.topMenu a:hover,
 .banner a:hover, .banner button:hover,
 #userPanel a:hover, #userPanel button:hover {
   background: white !important;
@@ -151,8 +135,8 @@ div[data-uiv="solidLogin"] input:hover,
 }
 .topMenu {
   text-align:center;
-  padding:0.5rem;
-  height:3rem;
+  padding:0.7rem;
+  height:3.5rem;
 }
 #userMenuToggle {
   background:transparent !important;
@@ -169,4 +153,21 @@ div[data-uiv="solidLogin"] input:hover,
 }
 .hidden {
   display:none;
+}
+
+#userPanel ul {
+  margin:0.25rem;
+  margin-right:0;
+  max-height:11rem;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+#userPanel li a{
+  display:inline-block;
+  width:95%;
+  margin-right:0;
+  padding-right:0;
+}
+#userPanel h3 {
+  background:#99dddd !important;
 }

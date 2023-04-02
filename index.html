@@ -1,39 +1,39 @@
 <!DOCTYPE html><html>
 <head>
-  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  <meta content="text/html; charset=UTF-8" http-equix="content-type">
   <base target="__BLANK" />
 </head><body style="display:none">
 
 <div class="banner">
-    <span><img data-uiv="solidLogo" /></span>
+    <span><img data-uix="solidLogo" /></span>
     <div class="podOwnerPanel">       
         <div class="podOwnerDescription">
-            <h2 data-uiv="podOwnerName"></h2>
-            <div data-uiv="podOwnerRole"></div>
-            <div data-uiv="podOwnerPronouns"></div>
+            <h2 data-uix="podOwnerName"></h2>
+            <div data-uix="podOwnerRole"></div>
+            <div data-uix="podOwnerPronouns"></div>
         </div>
     </div>
-    <img data-uiv="podOwnerPhoto" />
+    <img data-uix="podOwnerPhoto" />
 </div>
 
 <div class="topMenu">
     <span id="userMenuToggle">&equiv;</span>
-    <div data-uiv="solidLogin"></div>
+    <div data-uix="solidLogin"></div>
     <div class="podOwnerMenu">
-        <a data-uiv="podOwnerHome">Home</a> 
-        <a href="" data-uiv="podOwnerWebid">Profile</a>
-        <a data-uiv="podOwnerInstances"
+        <a data-uix="podOwnerHome">Home</a> 
+        <a href="" data-uix="podOwnerWebid">Profile</a>
+        <a data-uix="podOwnerInstances"
            data-where="vcard:AddressBook"
         >Address Book</a>
-        <a data-uiv="podOwnerInstances"
+        <a data-uix="podOwnerInstances"
            data-where="<http://www.w3.org/2005/01/wf/flow#Tracker>"
         >Roadmap</a>
-        <a data-uiv="podOwnerInstances"
+        <a data-uix="podOwnerInstances"
            data-where="<http://www.w3.org/ns/pim/meeting#LongChat>"
         >Chat with me!</a>
     </div>
     <span id="helpMenu">
-        <button data-uia="dropdown">?</button>
+        <button data-uix="dropdown">?</button>
         <div style="display:none">
             <a href="https://solidos.github.io/userguide/">User Guide</a>
             <a href="https://github.com/solidos/solidos/issues">Report a Probelem</a>
@@ -44,45 +44,44 @@
 <div class="page">
     <div id="userPanel" class="hidden">
 
-        <p> <b> my storages </b><br />
-            <select data-uiv="userStorages"></select>
-            <button data-uiv="submit">go</button>
-        </p>
-        <p><b>my tools</b><br />
-            <select data-uiv="userInstances"></select>  
-            <button data-uiv="submit">go</button>
-        </p>
-<!--
-        <p><b>my community tools</b><br />
-            <dl data-uiv="userCommunities"
-              data-loop="podOwnerInstances"
-            ></dl>  
-            <button data-uiv="submit">go</button>
-        </p>
--->
-        <p><b>my communities</b><br />
-            <select data-uiv="userCommunities"></select>
-            <button data-uiv="submit">go</button>
-        </p>
-        <p> <b>my friends</b><br />
-            <select data-uiv="userFriends"></select>
-            <button data-uiv="submit">go</button>
-        </p>
         <p style="text-align:center">
-          <a data-uia="editProfile">edit profile</a>
-          <a data-uia="editPreferences">edit preferences</a>
+          <a data-uix="editProfile">edit profile</a>
+          <a data-uix="editPreferences">edit preferences</a>
         </p>
-        
+
+<div data-uix="accordion">
+  <h3>my storages</h3>
+  <ul data-defer="userStorages"></ul>
+  <h3>my tools</h3>
+  <ul data-defer="userInstances"></ul>
+  <h3>my friends</h3>
+  <ul data-defer="userFriends"></ul>
+  <h3>my communities</h3>
+  <ul data-defer="userCommunities"></ul>
+</div>
+
+<!--
+<div data-uix="accordion">
+  <h3>my storages</h3>
+  <ul data-uix="userStorages"></ul>
+  <h3>my tools</h3>
+  <ul data-uix="userInstances"></ul>
+  <h3>my communities</h3>
+  <ul data-uix="userCommunities"></ul>
+  <h3>my friends</h3>
+  <ul data-uix="userFriends"></ul>
+</div>
+-->
     </div>
     <div class="content">
         <div id="notificationArea">
-<p>Welcome to a modular SolidOS front-end. Take it for a spin, being sure to notice that the center menu relates to the person you are visiting while the left-hand menu (after logging in, click the &equiv;) relates to you.  Visit a friend and see!
+<p>Welcome to a modular SolidOS front-end. Take it for a spin, being sure to notice that the center menu relates to the person you are visiting while the left-hand menu (after logging in, click the &equix;) relates to you.  Visit a friend and see!
 </p><p>
 Then look at view source of this page.  You'll see this is a zero-code app.  Everything is loaded using simple HTML tags. To find out more check out the WiP 
 <a href="https://github.com/jeff-zucker/solid-uix/">Solid UIX repo</a>.
 </p>
 </div>
-        <div data-uiv="solidOSbrowser"></div>
+        <div data-uix="solidOSbrowser"></div>
     </div>
 </div>
 <meta id="uriField" />

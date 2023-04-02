@@ -1,6 +1,5 @@
 import {ProfileSession} from "./profile.js";
 import {initLogin} from "./login.js";
-import {interpolateVariable} from "./variables.js";
 import * as util from './utils.js';
 
 export class UIX {
@@ -9,21 +8,19 @@ export class UIX {
     this.profileSession = new ProfileSession();
     this.initLogin = initLogin.bind(this);
   }
+
   async init(){
     let loading = document.getElementById('loading');
     if(loading) loading.style.display="none";
     await this.profileSession.initActors();
     await this.initLogin();
     await this.initVariables();
-    await this.initActions();
-    await this.initQueries();
     util.toggleUserPanel(this.podOwner);
     document.body.style.display="block";
   }
   async showInElement(actionElement,output){
     const self = this;
-    let opt = actionElement.dataset;
-    let actionVerb=((opt.uiv)||"").toLowerCase()||((opt.uiq)||"").toLowerCase();
+    let actionVerb=((actionElement.dataset.uix)||"").toLowerCase();
     switch(actionElement.tagName) {
       case 'IMG':
           actionElement.src = output;
@@ -39,11 +36,6 @@ export class UIX {
           actionElement.addEventListener('click',async(e)=> {
             e.preventDefault();
             let subject = e.target.href;
-            if(actionVerb==='submit'){
-               let p = e.target.parentNode;
-               let i = p.querySelector('SELECT') || p.querySelector('INPUT');
-               subject = i.value;                             
-            }
             this.showSolidOSlink(subject,actionElement);
           });
           // setStyle(actionElement,'buttonStyle');  // for example
@@ -65,14 +57,14 @@ export class UIX {
           }
           break;
       case 'DL' :
-            let outer = opt.uiv;
-            let inner = opt.loop;
+            let loop = actionElement.dataset.loop;
             for(let row of output){
               let dt = document.createElement('DT');
               dt.innerHTML = row.label || row;
+              dt.dataset.uix=loop;
               actionElement.appendChild(dt);
             }
-            console.log(output); //outer = await <dl data-uiv="userCommunities"
+            console.log(output); //outer = await <dl data-uix="userCommunities"
           break;
       case 'SELECT' :
           if(actionElement.options){
@@ -100,9 +92,21 @@ export class UIX {
           break;
       case 'UL' :
           for(let row of output){
-            let opt = document.createElement('LI');
-            opt.innerHTML = row;
-            actionElement.appendChild(opt);
+            let li = document.createElement('LI');
+            let anchor = document.createElement('A');
+            if(typeof row === 'string'){
+               anchor.href = anchor.innerHTML = row;
+            }              
+            else {
+               anchor.href = row.link;
+               anchor.innerHTML = row.label;
+            }
+            anchor.addEventListener('click',(e)=>{
+              e.preventDefault();
+              this.showSolidOSlink(e.target.href,actionElement);
+            });
+            li.appendChild(anchor);
+            actionElement.appendChild(li);
           }
           break;
       default : actionElement.innerHTML = output;
@@ -111,83 +115,95 @@ export class UIX {
 
 }
 
-/** @param {string||NamedNode} subject   - address/node of the resource to load
-  @param {object}            opt         - optional hash containing 
-  @param {string?}         pane          - name of SolidOS pane for display
-  @param {string?}         outlineElement- id of outline element
-  @param {HTMLElement?}    dom           - document context of outline element
- */
-async showSolidOSlink(subject,element){
-  const opt = element.dataset || {};
-  const isPodAction = opt.uiv && opt.uiv.match(/^podOwner/i);
-  if(!subject) return console.log("No subject supplied for SolidOSLink!");
-  subject = subject.uri ?subject :UI.rdf.sym(subject);
-  const o = panes.getOutliner(opt.dom || document);
-  let podOwner = await this.profileSession.add(subject.uri);
-  if(podOwner && !isPodAction){
-    this.refreshPodOwner(podOwner);
-  }
-  let pane = opt.pane ?panes.byName(opt.pane) :null;
-  await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
-}  
-  async refreshPodOwner(podOwner){
-    if(this.podOwner===podOwner.webid) return;
-    this.podOwner = podOwner.webid;
-    let actionElements = document.body.querySelectorAll('[data-uiv]') || [];
-    for(let actionElement of actionElements){
-      if(actionElement.dataset.uiv.match(/^podOwner/i)){
-         await this.processVariable(actionElement);
-      }
+  /** @param {string||NamedNode} subject   - address/node of the resource to load
+    @param {object}            opt         - optional hash containing 
+    @param {string?}         pane          - name of SolidOS pane for display
+    @param {string?}         outlineElement- id of outline element
+    @param {HTMLElement?}    dom           - document context of outline element
+   */
+  async showSolidOSlink(subject,element){
+    const opt = element.dataset || {};
+    if(!subject) return console.log("No subject supplied for SolidOSLink!");
+    subject = subject.uri ?subject :UI.rdf.sym(subject);
+    const o = panes.getOutliner(opt.dom || document);
+    let podOwner = await this.profileSession.add(subject.uri);
+//    this.refreshPodOwner(podOwner,element);
+    this.refreshPodOwner(subject,element);
+    let pane = opt.pane ?panes.byName(opt.pane) :null;
+    await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
+  }  
+
+  async refreshPodOwner(podOwner,element){
+    const isPodAction = element.dataset.uix && element.dataset.uix.match(/^podOwner/i);
+    if(!podOwner || isPodAction || this.podOwner===podOwner.webid) return;
+    let newPath = (new URL(podOwner.value)).host;
+    for(let p of Object.keys(this.profileSession.visited)){
+      let existingPath = (new URL(p.webid)).host;
     }
-  }
-  async initActions(elementToInit){
-    elementToInit ||= document.body;
-    let actionElements = elementToInit.querySelectorAll('[data-uia]') || [];
+    alert(newPath+"=="+existingPath);
+//    this.podOwner = podOwner.webid;
+    this.podOwner = podOwner.value;
+    let actionElements = document.body.querySelectorAll('[data-uix]') || [];
     for(let actionElement of actionElements){
-         await this.processAction(actionElement);
+      if(actionElement.dataset.uix.match(/^podOwner/i)){
+        await this.process(actionElement);
+      }
     }
   }
   async initVariables(elementToInit){
     elementToInit ||= document.body;
-    let actionElements = elementToInit.querySelectorAll('[data-uiv]') || [];
+    let actionElements = elementToInit.querySelectorAll('[data-uix]') || [];
     for(let actionElement of actionElements){
-         await this.processVariable(actionElement);
+         await this.process(actionElement);
     }
   }
-  async initQueries(elementToInit){
-    elementToInit ||= document.body;
-    let actionElements = elementToInit.querySelectorAll('[data-uiq]') || [];
-    for(let actionElement of actionElements){
-         await this.processQuery(actionElement);
+
+  async process(element){
+    if(typeof element==="string"){
+      element = document.getElementById(element.replace(/^#/,''));
     }
-  }
-  async activate(element){
-    if(typeof element==="string") element = document.getElementById(element.replace(/^#/,''));
     if(!element.dataset) return;
-    if(element.dataset.uiv) return this.processVariable(element);
-    else if(element.dataset.uiq) return this.processQuery(element);
-    else console.log("Non-actionable-element - " + element.id || element.tagName);
-  }
+    let actionVerb = (element.dataset.uix).toLowerCase();
+    let actionType = uixType[actionVerb] || "";
+    if(actionType==="query") return this.processQuery(element);
+    else if(actionType==="action") return this.processAction(element);
+    else return this.processVariable(element);
+  }  
+
   async processVariable(element){
-    let actionVerb = (element.dataset['uiv']).toLowerCase();
-    let output;
+    let actionVerb = (element.dataset.uix).toLowerCase();
+    let actor,output;
     const specifiedOwner = element.dataset.owner;
-    let actors = {
-      user: UI.authn.currentUser(),
-      owner: specifiedOwner || this.podOwner,
-    };
-    if(actors.owner) actors.owner = await this.profileSession.add(actors.owner);
-    if(actors.user) actors.user = await this.profileSession.add(actors.user);
     let v = actionVerb.toLowerCase();
     if(v.match(/^(edit|add)/)) v = 'user'+v;
-    if(v.match(/^podowner/))output = interpolateVariable.owner(v,element,actors);
-    if(v.match(/^user/)) output = interpolateVariable.user(v,element,actors);
-    if(v.match(/^solid/))output = interpolateVariable.solid(v,element,actors);
-    if(output || v==="submit") await this.showInElement(element,output)
+    if(v.match(/^solid/)){
+      v = v.replace(/^solid/,'');
+      output = solidVar[v]() || "";
+    }
+    else {
+      if(v.match(/^podowner/)){
+        v = v.replace(/^podowner/,'');
+        actor = specifiedOwner || this.podOwner;
+      }
+      else if(v.match(/^user/)){
+        v = v.replace(/^user/,'');
+        actor = UI.authn.currentUser();
+      }
+      if(!actor) return;
+      actor = await this.profileSession.add(actor);
+      if(v.match(/(friends|communities|instances)/)){
+        output = await actor.getAllWithNames(v,element);
+      }
+      else {
+        output = actor.get(v,element);
+      }
+    }
+    if(output) await this.showInElement(element,output)
   }
-  async processQuery(element,x){
-    let queryString = element.dataset.uiq;
-    let source =  element.dataset.source;
+
+  async processQuery(element){
+    let queryString = element.dataset.query;
+    let source =  element.dataset.endpoint;
     let param = element.dataset.paramelement;
     param = param ?util.getNodeFromFieldValue(param) :null;
     const matches = await util.string2statement(queryString,source,param);
@@ -199,10 +215,48 @@ async showSolidOSlink(subject,element){
     }
     if(matches) await this.showInElement(element,matches)
   }
+
   async processAction(element){
-    let action = element.dataset.uia;
+    let action = element.dataset.uix;
     let user = UI.authn.currentUser();
     let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action==='accordion'){
+      for(let kid of element.childNodes){
+        if(kid.tagName==="UL"){
+          kid.style="list-style:none;margin-left:0;padding-left:0;";        
+          kid.classList.add('hidden');
+        }
+        else {
+         kid.style="padding:1rem;margin:0;border-bottom:1px solid #909090; background:#dddddd; cursor:pointer;";
+          kid.addEventListener('click',async ()=>{
+            let displays = element.querySelectorAll('UL');             
+            for(let d of displays){
+              d.classList.add('hidden')
+            }
+            const selectedDropdown = kid.nextSibling.nextSibling
+            selectedDropdown.classList.remove('hidden')
+            let toDefer = selectedDropdown.dataset.defer;
+            let hasContent = selectedDropdown.innerHTML.length;
+            if(toDefer && !hasContent){
+              selectedDropdown.dataset.uix=toDefer;
+              await this.process(selectedDropdown);
+            }
+          });
+        }
+      }
+    }
+    if(action==='go'){
+      element.addEventListener('click',async(e)=> {
+        e.preventDefault();
+        let subject = element.href || element.dataset ?element.dataset.target :null;
+        if(!subject){
+           let p = e.target.parentNode;
+           let i = p.querySelector('SELECT') || p.querySelector('INPUT');
+           subject = i.value;                             
+        }
+        this.showSolidOSlink(subject,element);
+      });
+    }
     if(action==='toggleVisibility'){
       element.addEventListener('click',async(e)=> {
         e.preventDefault();
@@ -247,4 +301,34 @@ async showSolidOSlink(subject,element){
   }
 }
 
+  const uixType = {
+    toggleVisibility: "action",
+    dropdown: "action",
+    editprofile: "action",
+    editpreferences: "action",
+    go: "action",
+    accordion: "action",
+    query : "query",
+  }
 
+
+    const solidVar = {
+      logo: ()=>{
+        return "https://solidproject.org/assets/img/solid-emblem.svg";
+      },
+      login: ()=>{
+       return "";
+      },
+      osbrowser: ()=>{
+        return `
+          <header id="PageHeader"></header>
+          <div id="right-column-tabulator">
+            <div class="TabulatorOutline" role="main" id="suicTabulator">
+              <table id="outline"></table>
+              <div id="GlobalDashboard"></div>
+            </div>
+          </div>
+          <footer id="PageFooter"></footer>
+        `;
+      },
+    }

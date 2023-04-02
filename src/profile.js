@@ -59,6 +59,7 @@ export class Profile {
     return this;
   }
 
+
   // these return strings
   //
   get(requestString,element){
@@ -83,6 +84,38 @@ export class Profile {
     if( shortcut[requestString] ) return getShortcut(this,requestString,element);
     return _getProperties(this.webid,requestString);
   }
+
+getName(c){
+      c = $rdf.sym(c);
+      return  (store.any(c, ns.vcard('fn'))||"").value  
+              || (store.any(c, ns.foaf('name'))||"").value 
+              || (store.any(c, ns.dct('title'))||"").value 
+              || (store.any(c, ns.rdfs('label'))||"").value 
+              || (store.any(c, ns.ui('label'))||"").value 
+              || util.bestLabel(c.value);   
+}
+async getAllWithNames(requestString,element){
+  let results = [];
+  let predicate;
+  if(requestString==='instances') {
+    for(let instance of getShortcut(this,requestString,element)){
+      let link = instance.link;
+      let label = this.getName(instance.link);
+      results.push({link,label});
+    }
+  }
+  else if(requestString==='friends') predicate = predicate = 'foaf:knows';
+  else if(requestString==='communities') predicate = 'solid:community';
+  if(predicate){
+    for(let c of this.getall(predicate)){
+      await store.fetcher.load(c);
+      let link = c;
+      let label = this.getName(c);
+      results.push({label,link});
+    }
+  }
+  return results;
+}
 }
 
 const shortcut = {
@@ -111,7 +144,7 @@ function getShortcut(self,req,element){
   if(req.match(/^friends/)) return self.getall('foaf:knows');
   if(req.match(/^storages/)) return self.getall('space:storage');
   if(req.match(/^issuers/)) return self.getall('solid:oidcIssuer');
-  if(req.match(/^communities/))return self.getall('solid:community');
+  if(req.match(/^communities/)) return self.getall('solid:community');
   if(req.match(/^name/))
      return self.get('vcard:fn') || self.get('foaf:name') || self.webid.value;
   if(req.match(/^pronouns/)){
