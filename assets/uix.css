@@ -1,13 +1,11 @@
 * {
   font-family:Sans-Serif;
-  box-sizing: border-box;
 }
 body {
   margin:0 !important;
   padding:0 !important;
   background:#99dddd !important;
 }
-
 #helpMenu {
   position:absolute;
   right:0.5rem;
@@ -27,6 +25,7 @@ body {
   width:20ch;
   display:block;
   padding:0.5rem;
+  border:1px solid white;
   background:teal;
   color:white;
 }
@@ -40,39 +39,38 @@ body {
 }
 
 #notificationArea {
+  width:50ch;
   margin:2rem;
 }
 
 .topBar, .topMenu, #userPanel {
   background:#008080 !important; // teal
 }
-.page {
+body {
+//jz  overflow:hidden;
+}
+.content {
+  overflow:auto;
+}
+#page {
   display:grid;
-  grid-template-columns: 46ch auto;
-  height:100%;
+  grid-template-columns: 49ch auto;
+//  height:77%;
+  width:100%;
 }
-#userPanel {
-  padding:1rem;
+#page.hidden {
+  grid-template-columns: auto;
 }
-#userPanel textarea {
-  height:4rem;
-  border:1px solid  #7C4DFF;
-  boder-radius:0.2rem !important;
-  padding-left:1rem;
-  padding-right:1rem;
+#page.hidden .content {
+  display:block;
+  width:100vw !important;
 }
-#userPanel a {
-  color:black !important;
-  border:1px solid black !important;
+#page.hidden #userPanel {
+  display:none;
 }
-#loading {
-  font-size:200%;
-  margin:12rem;
+.hidden {
+  display:none;
 }
-.topBar {
-  height:2.5rem;
-}
-
 /** BANNER
 */
 .banner {
@@ -91,6 +89,11 @@ body {
 div[data-uix="solidLogin"] {
   position:absolute;
   left:3rem;
+}
+div[data-uix="userWebid"] {
+  margin-top:0;
+  display:table-cell;
+  font-size:90%;
 }
 div[data-uix="solidLogin"] input {
   margin:0;
@@ -111,7 +114,7 @@ img[data-uix="solidLogo"] {
 div[data-uix="solidLogin"] input,
 .podOwnerMenu a, .podOwnerMenu button, #userPanel a, #userPanel button  {
   border-radius:0.2rem;
-  border:1px solid white;
+  border:none;
   padding:0.4rem;
   text-decoration:none;
   margin-right:1rem;
@@ -131,12 +134,12 @@ div[data-uix="solidLogin"] input:hover,
   color:teal !important;
 }
 .topMenu button, .topMenu a {
-  border:1px solid white;
+//  border:1px solid white;
 }
 .topMenu {
   text-align:center;
   padding:0.7rem;
-  height:3.5rem;
+  height:2rem;
 }
 #userMenuToggle {
   background:transparent !important;
@@ -151,10 +154,36 @@ div[data-uix="solidLogin"] input:hover,
   font-weight:bold;
   opacity:50%;
 }
-.hidden {
-  display:none;
+.content{
+  text-align:left;
+  margin-left:0;
 }
-
+#userPanel {
+  width:45ch;
+  padding:1rem;
+  padding-top:0rem;
+}
+[data-uix=quicknotes] {
+  margin-top:0.25rem;
+  margin-bottom:1rem;
+}
+#userPanel textarea {
+  width:43ch;
+}
+#userPanel ul {
+  width:40ch;
+}
+#userPanel textarea {
+  margin:0 !important;
+  margin-top:1rem !important;
+  background:#99dddd !important;
+  height:8rem;
+  margin-right:1rem;
+}
+#userPanel a {
+//  color:black !important;
+//  border:1px solid black !important;
+}
 #userPanel ul {
   margin:0.25rem;
   margin-right:0;
@@ -169,5 +198,7 @@ div[data-uix="solidLogin"] input:hover,
   padding-right:0;
 }
 #userPanel h3 {
+  border-radius:0.2rem;
+  font-weight:500 !important;
   background:#99dddd !important;
 }

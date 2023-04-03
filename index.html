@@ -2,7 +2,7 @@
 <head>
   <meta content="text/html; charset=UTF-8" http-equix="content-type">
   <base target="__BLANK" />
-</head><body style="display:none">
+</head><body>
 
 <div class="banner">
     <span><img data-uix="solidLogo" /></span>
@@ -17,7 +17,10 @@
 </div>
 
 <div class="topMenu">
-    <span id="userMenuToggle">&equiv;</span>
+<!--
+    <span id="userMenuToggle">&equiv;</span> 
+-->
+    <span id="userMenuToggle" data-uix="toggleVisibility" data-target="#page">&equiv;</span>
     <div data-uix="solidLogin"></div>
     <div class="podOwnerMenu">
         <a data-uix="podOwnerHome">Home</a> 
@@ -41,39 +44,29 @@
     </span>
 </div>
 
-<div class="page">
-    <div id="userPanel" class="hidden">
+<div id="page" class="hidden">
+    <div id="userPanel">
 
-        <p style="text-align:center">
-          <a data-uix="editProfile">edit profile</a>
-          <a data-uix="editPreferences">edit preferences</a>
-        </p>
+        <div data-uix="userWebid"></div>
 
-<div data-uix="accordion">
-  <h3>my storages</h3>
-  <ul data-defer="userStorages"></ul>
-  <h3>my tools</h3>
-  <ul data-defer="userInstances"></ul>
-  <h3>my friends</h3>
-  <ul data-defer="userFriends"></ul>
-  <h3>my communities</h3>
-  <ul data-defer="userCommunities"></ul>
-</div>
+            <a data-uix="editProfile">edit profile</a>
+            <a data-uix="editPreferences">edit preferences</a>
+            <a data-uix="toggleVisibility">quick notes</a>
+            <div data-uix="quicknotes" class="hidden"></div>
 
-<!--
-<div data-uix="accordion">
-  <h3>my storages</h3>
-  <ul data-uix="userStorages"></ul>
-  <h3>my tools</h3>
-  <ul data-uix="userInstances"></ul>
-  <h3>my communities</h3>
-  <ul data-uix="userCommunities"></ul>
-  <h3>my friends</h3>
-  <ul data-uix="userFriends"></ul>
-</div>
--->
+        <div data-uix="accordion">
+            <h3>storages</h3>
+            <ul data-defer="userStorages"></ul>
+            <h3>tools</h3>
+            <ul data-defer="userInstances"></ul>
+            <h3>friends</h3>
+            <ul data-defer="userFriends"></ul>
+            <h3>communities</h3>
+            <ul data-defer="userCommunities"></ul>
+        </div>
     </div>
     <div class="content">
+
         <div id="notificationArea">
 <p>Welcome to a modular SolidOS front-end. Take it for a spin, being sure to notice that the center menu relates to the person you are visiting while the left-hand menu (after logging in, click the &equix;) relates to you.  Visit a friend and see!
 </p><p>
@@ -84,7 +77,6 @@ Then look at view source of this page.  You'll see this is a zero-code app.  Eve
         <div data-uix="solidOSbrowser"></div>
     </div>
 </div>
-<meta id="uriField" />
 
 <!-- just imported libraries below here, nothing to see -->
 

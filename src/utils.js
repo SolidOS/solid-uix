@@ -69,26 +69,6 @@ export function getNodeFromFieldValue(fieldSelector,key){
    catch(e){ console.log(e) }
 }
 
-export function toggleUserPanel(podOwner){
-    const userPanel = document.getElementById('userPanel');
-    const menuToggle = document.getElementById('userMenuToggle');
-    const ownerMenu = document.querySelector('.podOwnerMenu');
-    if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
-    if(!userPanel || !menuToggle) return;
-    const user = UI.authn.currentUser();
-    if(user) {
-      menuToggle.style.opacity="100%";
-      menuToggle.style.cursor="pointer";
-      menuToggle.addEventListener('click',()=>{
-        document.getElementById('userPanel').classList.toggle('hidden');
-      });
-    }
-    else {
-      menuToggle.style.opacity="50%";
-      menuToggle.style.cursor="default";
-      menuToggle.addEventListener('click',()=>{});
-    }
-}
 
 
 

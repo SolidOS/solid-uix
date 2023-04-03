@@ -10,17 +10,14 @@ export class UIX {
   }
 
   async init(){
-    let loading = document.getElementById('loading');
-    if(loading) loading.style.display="none";
-    await this.profileSession.initActors();
     await this.initLogin();
     await this.initVariables();
-    util.toggleUserPanel(this.podOwner);
-    document.body.style.display="block";
+    this.toggleUserPanel(this.podOwner);
   }
   async showInElement(actionElement,output){
     const self = this;
     let actionVerb=((actionElement.dataset.uix)||"").toLowerCase();
+    if(actionVerb.match(/home/)) actionElement.dataset.pane="folder";
     switch(actionElement.tagName) {
       case 'IMG':
           actionElement.src = output;
@@ -132,6 +129,28 @@ export class UIX {
     o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
   }  
 
+  async toggleUserPanel(podOwner){
+    const userPanel = document.getElementById('userPanel');
+    const menuToggle = document.getElementById('userMenuToggle');
+    const ownerMenu = document.querySelector('.podOwnerMenu');
+    if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
+    if(!userPanel) return;
+    const user = UI.authn.currentUser();
+    if(user) {
+      menuToggle.style.opacity="100%";
+      menuToggle.style.cursor="pointer";
+      if(this.podOwner){
+        let owner = await this.profileSession.add(this.podOwner);
+        let home = owner.get('storages')[0];
+        await this.showSolidOSlink(home,{dataset:{uix:'podOwnerHome',pane:"folder"}});
+      }
+    }
+    else {
+      menuToggle.style.opacity="50%";
+      menuToggle.style.cursor="default";
+      menuToggle.addEventListener('click',()=>{});
+    }
+  }
   async refreshPodOwner(webid,element){
     /** 
          Refresh the podOwner areas: name,role,pronouns,photo,podOwnerMenu
@@ -140,7 +159,7 @@ export class UIX {
     const action = element && element.dataset ?element.dataset.uix :"";
     const isPodAction = action.match(/^podOwner/i);
     const isUserAction = action.match(/^user/i) && !action.match(/(communities|friends)/i);
-    const user = UI.authn.currentUser().value;
+    const user = (UI.authn.currentUser()||"").value;
     this.podOwner ||= user;
     if(!webid) return;                // no new owner, so no refresh
     if(isPodAction) return;           // action is by existing podOwner, so no refresh
@@ -226,10 +245,102 @@ export class UIX {
     if(matches) await this.showInElement(element,matches)
   }
 
+/**
+    @param {IRI} form - required: form location
+    @param {IRI} subject - required: data location
+    @param {String?} formString - optional in-memory form
+    @param {IRI?} formResultsDocument - optional location for form data (defaults to formSubject)
+    @param {HTMLElement?} container - optional HTML element, defaults to new DIV;
+    @param {HTMLDOM?} dom - optional dom, defaults to document;
+    @return {HTMLElement}
+ */
+  async showForm(o){
+    const dom = o.dom || document;
+    const container = o.container || document.createElement("DIV");
+    let form = UI.rdf.sym(o.form);
+    let doc = o.formResultDocument;
+    let formFromString = o.formString;
+    let subject = o.formSubject;
+    let script = o.script || function(){};
+    try {
+      subject = $rdf.sym(subject) ;
+      if(o.formString){
+        UI.rdf.parse(o.formString,UI.store,o.form,'text/turtle');
+      }
+      else await UI.store.fetcher.load(o.form);
+      await UI.store.fetcher.load(subject.doc());
+      await UI.widgets.appendForm(dom, container, {}, subject, form, doc, script);
+    }
+    catch(e){
+       alert(e);
+       container.innerHTML = "FORM ERROR:"+e;
+    }  
+    return container;
+  }
+
+  /* getUIXconfig()
+      if logged-in, load preferences
+      find a triple in the form <thisApp> ui:configurationContainer <yourUIXcontainer>.
+      look there for resources such as quicknotes.ttl
+  */
+  async getUIXconfig(action){
+    let UIXconfig = {};
+    const loggedInUser = await this.profileSession.loggedInUser();
+    if(!loggedInUser) return {};
+    let prefs = loggedInUser.context.preferencesFile;
+    await UI.store.fetcher.load(prefs);
+    let thisApp = UI.rdf.sym('https://jeff-zucker.github.io/solid-uix/index.html');
+    const UIXcontainer = UI.store.any(thisApp,UI.ns.ui('configurationContainer'));
+    if(!UIXcontainer) {
+      // TBD - prompt for a container, create & permission it, add it to preferencesFile
+      // alert("No UIX configuration pointer in prefs file! See the help menu to create one.");
+      return UIXconfig;
+    }
+    else {
+      if(action==="quicknotes"){
+        try {
+          await UI.store.fetcher.load(UIXcontainer);
+        }
+        catch(e){ 
+          if(e.toString().match(/not found/i)){
+            // alert(`No UIX container '${UIXcontainer}' found, see help menu to create one.`);
+            // TBD - create UIX container if it doesn't exist
+          } 
+          else alert(e); 
+          return UIXconfig;
+        }
+        try {
+          let fn = UIXcontainer.value+'quicknotes.ttl';
+          await UI.store.fetcher.load(fn)
+          UIXconfig.quicknotes = fn;
+        }
+        catch(e){
+          // TBD - create quicknotes.ttl if it doesn't exist
+          // alert("No quicknotes.ttl found! See the help menu to create one.");
+          return UIXconfig;
+        }
+      }
+    }
+    return UIXconfig;
+  }
+
   async processAction(element){
     let action = element.dataset.uix;
     let user = UI.authn.currentUser();
     let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action==='quicknotes'){
+      const config = await this.getUIXconfig(action);
+      if(!config || !config.quicknotes) {
+        alert("See the help menu for installing quicknotes on your pod!");
+        return;
+      }
+      let form =  await this.showForm({
+        form: `${config.quicknotes}#Form`,
+        formSubject: `${config.quicknotes}#Data`,
+      });
+      let area = await form.querySelector('TEXTAREA');
+      element.appendChild( area );
+    }
     if(action==='accordion'){
       for(let kid of element.childNodes){
         if(kid.tagName==="UL"){
@@ -237,19 +348,28 @@ export class UIX {
           kid.classList.add('hidden');
         }
         else {
-         kid.style="padding:1rem;margin:0;border-bottom:1px solid #909090; background:#dddddd; cursor:pointer;";
+         kid.style="padding:1rem;margin:0;border-bottom:1px solid #909090; background:#dddddd; cursor:pointer;display:grid;grid-template-columns=auto auto";
+         let html = kid.innerHTML;
+         kid.innerHTML = `<span>${html}</span><span style="display:inline-block;text-align:right;margin-top:-1.25rem;">&or;</span>`;
           kid.addEventListener('click',async ()=>{
+          const selectedDropdown = kid.nextSibling.nextSibling;
             let displays = element.querySelectorAll('UL');             
+            let kidHiddenNow = selectedDropdown.classList.contains('hidden');
             for(let d of displays){
               d.classList.add('hidden')
             }
-            const selectedDropdown = kid.nextSibling.nextSibling
-            selectedDropdown.classList.remove('hidden')
+            if(kidHiddenNow) selectedDropdown.classList.remove('hidden');
+            else selectedDropdown.classList.add('hidden');
             let toDefer = selectedDropdown.dataset.defer;
             let hasContent = selectedDropdown.innerHTML.length;
             if(toDefer && !hasContent){
               selectedDropdown.dataset.uix=toDefer;
+              let loading = document.createElement('P');
+              loading.innerHTML = "loading ...";
+              loading.style["margin-right"]="0.5rem";
+              selectedDropdown.appendChild(loading);
               await this.process(selectedDropdown);
+              loading.style.display="none";
             }
           });
         }
@@ -272,6 +392,7 @@ export class UIX {
         e.preventDefault();
         let button = e.target;
         let target = button.dataset.target || button.nextSibling.nextSibling;
+        target = typeof target === "string" ?document.getElementById(target.replace(/^#/,'')) :target;
         target.classList.toggle('hidden');
       });
     }
@@ -305,17 +426,18 @@ export class UIX {
         pane = 'basicPreferences';
       }
       element.addEventListener(eventType,()=> {
-        this.showSolidOSlink(subject,{dataset:{pane}});
+        this.showSolidOSlink(subject,{dataset:{uix:'userEditProfile',pane}});
       });
     }
   }
 }
 
   const uixType = {
-    toggleVisibility: "action",
+    togglevisibility: "action",
     dropdown: "action",
     editprofile: "action",
     editpreferences: "action",
+    quicknotes: "action",
     go: "action",
     accordion: "action",
     query : "query",

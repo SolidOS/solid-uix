@@ -21,6 +21,13 @@ export class ProfileSession {
     this.owner = "";
   }
 
+  async loggedInUser(){
+    let u = UI.authn.currentUser();
+    if(!u) return;
+    u = await this.add(u.value);
+    return u
+  }
+
   async add(webid) {
     if(!this.visited[webid]) {
       if(!webid) return;
@@ -28,13 +35,6 @@ export class ProfileSession {
       this.visited[webid]=true;
     }
     return this.profile[webid];
-  }
-
-  async initActors(){
-    let podOwner = (document.getElementById('uriField')||{}).value;
-    // let loggedInUser = (UI.authn.currentUser()||{}).uri;
-    this.owner = await this.add(podOwner);
-    //this.user = await this.init(loggedInUser);
   }
 
 }

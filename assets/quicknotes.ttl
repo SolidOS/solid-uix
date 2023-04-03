@@ -1,0 +1,7 @@
+@prefix ui: <http://www.w3.org/ns/ui#>.
+
+<#Form> a ui:Form; ui:parts ( <#notesField> ).
+
+<#notesField> a ui:MultiLineTextField; ui:property ui:content.
+
+<#Data> ui:content "Solid-UIX quick notes - type and it gets auto-saved to your pod!".

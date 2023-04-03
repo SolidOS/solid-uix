@@ -1,19 +1,8 @@
 const authSession = UI.authn.authSession;
 const loginButtonArea = document.querySelector("[data-uix=solidLogin]");
 
-var port =3101;
-
-var host = `http://localhost:${port}`;
-
 window.SolidAppContext = {
-  app : host,
-  webid : host + "/profile/card#me",
   scroll : 212 // for eyeFocus, should be height of top banner
-}
-
-window.$SolidTestEnvironment = {
-  iconBase : "/common/icons/",
-  originalIconBase : "/common/originalIcons/",
 }
 
 document.addEventListener('DOMContentLoaded', function() {
