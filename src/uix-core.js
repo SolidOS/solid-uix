@@ -136,19 +136,25 @@ export class UIX {
     if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
     if(!userPanel) return;
     const user = UI.authn.currentUser();
+    function toggleVis(e){
+      let targetId = e.target.dataset.target.replace(/^#/,'');
+      let target = document.getElementById(targetId);
+      if(target) target.classList.toggle('hidden')
+    }
     if(user) {
       menuToggle.style.opacity="100%";
       menuToggle.style.cursor="pointer";
       if(this.podOwner){
         let owner = await this.profileSession.add(this.podOwner);
         let home = owner.get('storages')[0];
+        menuToggle.addEventListener('click',toggleVis)
         await this.showSolidOSlink(home,{dataset:{uix:'podOwnerHome',pane:"folder"}});
       }
     }
     else {
       menuToggle.style.opacity="50%";
       menuToggle.style.cursor="default";
-      menuToggle.addEventListener('click',()=>{});
+      menuToggle.removeEventListener('click',toggleVis)
     }
   }
   async refreshPodOwner(webid,element){
