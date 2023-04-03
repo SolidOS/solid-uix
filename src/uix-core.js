@@ -284,9 +284,11 @@ export class UIX {
       look there for resources such as quicknotes.ttl
   */
   async getUIXconfig(action){
-    let UIXconfig = {};
     const loggedInUser = await this.profileSession.loggedInUser();
     if(!loggedInUser) return {};
+    let UIXconfig = {};
+     UIXconfig.uixContainer = await this.getUIXcontainer();
+    if(!UIXconfig.uixContainer) return {};
     let prefs = loggedInUser.context.preferencesFile;
     await UI.store.fetcher.load(prefs);
     let thisApp = UI.rdf.sym('https://jeff-zucker.github.io/solid-uix/index.html');
@@ -310,7 +312,7 @@ export class UIX {
           return UIXconfig;
         }
         try {
-          let fn = UIXcontainer.value+'quicknotes.ttl';
+          let fn = UIXcontainer.value+'quicknotes/quicknotes.ttl';
           await UI.store.fetcher.load(fn)
           UIXconfig.quicknotes = fn;
         }
@@ -324,14 +326,53 @@ export class UIX {
     return UIXconfig;
   }
 
+  appBase = 'https://jeff-zucker.github.io/solid-uix/';
+
+  async getUIXcontainer(plugin){
+    let app = UI.rdf.sym(this.appBase+'index.html');
+    const container = UI.store.any(app,UI.ns.ui('configurationContainer'));
+    if(container) return container;
+    const loggedInUser = await this.profileSession.loggedInUser();
+    if(!loggedInUser) return;
+    let prefs = loggedInUser.context.preferencesFile;
+    await UI.store.fetcher.load(prefs);
+    return UI.store.any(app,UI.ns.ui('configurationContainer'));
+  }
+  async makeUIXContainer(){
+  
+  }
+  async addPluginResource(pluginContainer,resource){
+    resource = pluginContainer + resource;
+  }
+  async installPlugin(plugin){
+    let UIXcontainer = await this.getUIXcontainer();
+      // UIXcontainer ||= await this.makeUIXContainer();
+    if(!UIXcontainer){return}
+    let pluginContainer = UIXcontainer.value + plugin.slug + "/";
+    
+    try {
+      let r = await UI.store.fetcher.webOperation('HEAD',pluginContainer);
+      if(r.ok) return;
+      for(let resource of plugin.resources){
+        this.addPluginResource(pluginContainer,this.appBase+resource);
+      }
+    }
+    catch(e) { alert(e); }
+    this.plugins ||= {};
+    this.plugins[plugin.slug]=true;
+  }
+
   async processAction(element){
     let action = element.dataset.uix;
     let user = UI.authn.currentUser();
     let eventType = element.tagName==='SELECT' ?'change' :'click';
     if(action==='quicknotes'){
-      const config = await this.getUIXconfig(action);
+      // TBD auto-install
+      // if(!this.plugins[plugin.slug]){
+      //  await this.installPlugin({slug:'quicknotes',resources:['assets/quicknotes.ttl']});
+      // }
+      let config = await this.getUIXconfig(action);
       if(!config || !config.quicknotes) {
-        alert("See the help menu for installing quicknotes on your pod!");
         return;
       }
       let form =  await this.showForm({
