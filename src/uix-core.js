@@ -1,5 +1,6 @@
 import {ProfileSession} from "./profile.js";
 import {initLogin} from "./login.js";
+import {processPlugin} from "./plugins.js";
 import * as util from './utils.js';
 
 export class UIX {
@@ -7,6 +8,7 @@ export class UIX {
   constructor(){
     this.profileSession = new ProfileSession();
     this.initLogin = initLogin.bind(this);
+    this.processPlugin = processPlugin.bind(this);
   }
 
   async init(){
@@ -137,8 +139,7 @@ export class UIX {
     if(!userPanel) return;
     const user = UI.authn.currentUser();
     function toggleVis(e){
-      let targetId = e.target.dataset.target.replace(/^#/,'');
-      let target = document.getElementById(targetId);
+      let target = document.getElementById('userPanel');
       if(target) target.classList.toggle('hidden')
     }
     if(user) {
@@ -284,109 +285,14 @@ export class UIX {
     return container;
   }
 
-  /* getUIXconfig()
-      if logged-in, load preferences
-      find a triple in the form <thisApp> ui:configurationContainer <yourUIXcontainer>.
-      look there for resources such as quicknotes.ttl
-  */
-  async getUIXconfig(action){
-    const loggedInUser = await this.profileSession.loggedInUser();
-    if(!loggedInUser) return {};
-    let UIXconfig = {};
-     UIXconfig.uixContainer = await this.getUIXcontainer();
-    if(!UIXconfig.uixContainer) return {};
-    let prefs = loggedInUser.context.preferencesFile;
-    await UI.store.fetcher.load(prefs);
-    let thisApp = UI.rdf.sym('https://jeff-zucker.github.io/solid-uix/index.html');
-    const UIXcontainer = UI.store.any(thisApp,UI.ns.ui('configurationContainer'));
-    if(!UIXcontainer) {
-      // TBD - prompt for a container, create & permission it, add it to preferencesFile
-      // alert("No UIX configuration pointer in prefs file! See the help menu to create one.");
-      return UIXconfig;
-    }
-    else {
-      if(action==="quicknotes"){
-        try {
-          await UI.store.fetcher.load(UIXcontainer);
-        }
-        catch(e){ 
-          if(e.toString().match(/not found/i)){
-            // alert(`No UIX container '${UIXcontainer}' found, see help menu to create one.`);
-            // TBD - create UIX container if it doesn't exist
-          } 
-          else alert(e); 
-          return UIXconfig;
-        }
-        try {
-          let fn = UIXcontainer.value+'quicknotes/quicknotes.ttl';
-          await UI.store.fetcher.load(fn)
-          UIXconfig.quicknotes = fn;
-        }
-        catch(e){
-          // TBD - create quicknotes.ttl if it doesn't exist
-          // alert("No quicknotes.ttl found! See the help menu to create one.");
-          return UIXconfig;
-        }
-      }
-    }
-    return UIXconfig;
-  }
-
-  appBase = 'https://jeff-zucker.github.io/solid-uix/';
-
-  async getUIXcontainer(plugin){
-    let app = UI.rdf.sym(this.appBase+'index.html');
-    const container = UI.store.any(app,UI.ns.ui('configurationContainer'));
-    if(container) return container;
-    const loggedInUser = await this.profileSession.loggedInUser();
-    if(!loggedInUser) return;
-    let prefs = loggedInUser.context.preferencesFile;
-    await UI.store.fetcher.load(prefs);
-    return UI.store.any(app,UI.ns.ui('configurationContainer'));
-  }
-  async makeUIXContainer(){
-  
-  }
-  async addPluginResource(pluginContainer,resource){
-    resource = pluginContainer + resource;
-  }
-  async installPlugin(plugin){
-    let UIXcontainer = await this.getUIXcontainer();
-      // UIXcontainer ||= await this.makeUIXContainer();
-    if(!UIXcontainer){return}
-    let pluginContainer = UIXcontainer.value + plugin.slug + "/";
-    
-    try {
-      let r = await UI.store.fetcher.webOperation('HEAD',pluginContainer);
-      if(r.ok) return;
-      for(let resource of plugin.resources){
-        this.addPluginResource(pluginContainer,this.appBase+resource);
-      }
-    }
-    catch(e) { alert(e); }
-    this.plugins ||= {};
-    this.plugins[plugin.slug]=true;
-  }
-
   async processAction(element){
     let action = element.dataset.uix;
     let user = UI.authn.currentUser();
     let eventType = element.tagName==='SELECT' ?'change' :'click';
     if(action==='quicknotes'){
-      // TBD auto-install
-      // if(!this.plugins[plugin.slug]){
-      //  await this.installPlugin({slug:'quicknotes',resources:['assets/quicknotes.ttl']});
-      // }
-      let config = await this.getUIXconfig(action);
-      if(!config || !config.quicknotes) {
-        return;
-      }
-      let form =  await this.showForm({
-        form: `${config.quicknotes}#Form`,
-        formSubject: `${config.quicknotes}#Data`,
-      });
-      let area = await form.querySelector('TEXTAREA');
-      element.appendChild( area );
+//      element.addEventListener('click',async (e)=>{
+         await this.processPlugin('quicknotes',element);
+//      });
     }
     if(action==='accordion'){
       for(let kid of element.childNodes){
