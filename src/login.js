@@ -1,9 +1,23 @@
 const authSession = UI.authn.authSession;
 const loginButtonArea = document.querySelector("[data-uix=solidLogin]");
 
-window.SolidAppContext = {
-  scroll : 212 // for eyeFocus, should be height of top banner
+const inDataKitchen=true;
+if(inDataKitchen){
+  var port =3101;
+  var host = `http://localhost:${port}`;
+  window.SolidAppContext = {
+    noAuth : host,
+     webId : host + "/profile/card#me",
+       app : host,
+  };
+  window.$SolidTestEnvironment = {
+    iconBase : "/common/icons/",
+    originalIconBase : "/common/originalIcons/",
+  };
 }
+
+window.SolidAppContext ||= {};
+window.SolidAppContext.scroll = "212"
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -30,7 +44,9 @@ export async function initLogin(loginType){
     loginButtonArea.appendChild(UI.login.loginStatusBox(document, null, {}));
     const signupButton = loginButtonArea.querySelectorAll('input')[1];
     if(signupButton) signupButton.style.display="none";
-    let me = await UI.authn.checkUser();
+//    let me = await UI.authn.checkUser();
+    let me = await UI.authn.currentUser();
+
     let button = loginButtonArea.querySelector('input');         
     let dataset = loginButtonArea.dataset;
     let inLabel = dataset.inlabel;

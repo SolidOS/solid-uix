@@ -36,7 +36,7 @@ export class ProfileSession {
     }
     return this.profile[webid];
   }
-
+  loadProfile = this.add;
 }
 
 export class Profile {
@@ -53,6 +53,7 @@ export class Profile {
         return this;
       }
       catch(e){
+        console.log("Could not load "+webid);
       }
     }
     this.context = await harvestProfile(webid);
@@ -215,8 +216,7 @@ async function constructContext(webidString){
       await store.fetcher.load(namedNode);
       return namedNode;
     }
-    catch(e){}
-//    catch(e){ return console.log(`load failed for '${url}': ${e}.`); }
+    catch(e){ return console.log(`load failed for '${url}': ${e}.`); }
   }
 
 function _getProperties(subject,curie){

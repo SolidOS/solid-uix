@@ -1,6 +1,6 @@
 import {ProfileSession} from "./profile.js";
 import {initLogin} from "./login.js";
-import {processPlugin} from "./plugins.js";
+import {processPlugin,processStandAlonePlugin} from "./plugins.js";
 import * as util from './utils.js';
 
 export class UIX {
@@ -9,6 +9,7 @@ export class UIX {
     this.profileSession = new ProfileSession();
     this.initLogin = initLogin.bind(this);
     this.processPlugin = processPlugin.bind(this);
+    this.processStandAlonePlugin = processStandAlonePlugin.bind(this);
   }
 
   async init(){
@@ -125,10 +126,16 @@ export class UIX {
     const opt = element.dataset || {};
     if(!subject) return console.log("No subject supplied for SolidOSLink!");
     subject = subject.uri ?subject :UI.rdf.sym(subject);
+    const params = new URLSearchParams(location.search)        
+    params.set('uri', subject.uri);                                    
+    let base = "http://localhost:3101/public/s/solid-uix/"
     const o = panes.getOutliner(opt.dom || document);
     await this.refreshPodOwner(subject.uri,element);
+    let currentPage = document.body.querySelector("[data-uix=currentPage]");
+    if(currentPage) currentPage.innerHTML = subject.uri;
     let pane = opt.pane ?panes.byName(opt.pane) :null;
-    o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
+    await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
+    window.history.replaceState({}, '', `${base}?${params}`);  
   }  
 
   async toggleUserPanel(podOwner){
@@ -203,11 +210,13 @@ export class UIX {
     let actionType = uixType[actionVerb] || "";
     if(actionType==="query") return this.processQuery(element);
     else if(actionType==="action") return this.processAction(element);
+    else if(actionVerb==="standAlonePlugin") return this.processStandAlonePlugin(element);
     else return this.processVariable(element);
   }  
 
   async processVariable(element){
     let actionVerb = (element.dataset.uix).toLowerCase();
+    if(actionVerb==="standaloneplugin") return this.processStandAlonePlugin(element);
     let actor,output;
     const specifiedOwner = element.dataset.owner;
     let v = actionVerb.toLowerCase();
@@ -279,7 +288,7 @@ export class UIX {
       await UI.widgets.appendForm(dom, container, {}, subject, form, doc, script);
     }
     catch(e){
-       alert(e);
+       console.log(e);
        container.innerHTML = "FORM ERROR:"+e;
     }  
     return container;

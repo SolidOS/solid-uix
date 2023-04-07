@@ -40,10 +40,9 @@
         </div>
     </span>
 </div>
-
 <div id="page">
    <div id="userPanel" class="hidden">
-        <div data-uix="userWebid"></div>
+        <span data-uix="userWebid"></span>
         <div class="editMenu">
             <a data-uix="editProfile">edit profile</a>
             <a data-uix="editPreferences">edit preferences</a>
@@ -51,17 +50,28 @@
             <div data-uix="quicknotes" class="hidden"></div>
         </div>
         <div data-uix="accordion">
-            <h3>storages</h3>
+            <h3>data storages</h3>
             <ul data-uix="userStorages"></ul>      <!-- loads on login -->
-            <h3>tools</h3>
+            <h3>personal information tools</h3>
             <ul data-uix="userInstances"></ul>     <!-- loads on login -->
             <h3>friends</h3>
             <ul data-defer="userFriends"></ul>     <!-- loads on first use or not at all -->
             <h3>communities</h3>
             <ul data-defer="userCommunities"></ul> <!-- loads on first use or not at all -->
+            <h3>developer tools</h3>
+            <ul>
+                <li><a data-source="http://localhost:3101/public/s/solid-uix/assets/solidSpecs.js"
+                       data-uix="standAlonePlugin"
+                >The Solid Specifications</a>
+                <li><a data-source="http://localhost:3101/public/s/solid-uix/assets/ontologyBrowser.js"
+                       data-uix="standAlonePlugin"
+                >Ontology Explorer</a>
+            </ul>
         </div>
     </div>
     <div class="content">
+
+        <div data-uix="currentPage"></div>
 
         <div id="notificationArea">
 <p>Welcome to a modular SolidOS front-end. Take it for a spin, being sure to notice that the center menu relates to the person you are visiting while the left-hand menu (after logging in, click the &equiv;) relates to you.  Visit a friend and see!
@@ -70,7 +80,9 @@ Then look at view source of this page.  You'll see this is a zero-code app.  Eve
 <a href="https://github.com/jeff-zucker/solid-uix/">Solid UIX repo</a>.
 </p>
 </div>
-        <div data-uix="solidOSbrowser"></div>
+        <div id="pluginArea">
+          <div data-uix="solidOSbrowser"></div>
+        </div>
     </div>
 </div>
 
@@ -80,8 +92,10 @@ Then look at view source of this page.  You'll see this is a zero-code app.  Eve
 </script>
 <script type="module"> 
     import {UIX} from './src/uix-core.js';
+    var uix;
     document.addEventListener('DOMContentLoaded', ()=>{
-        (new UIX()).init();
+        uix = new UIX();
+        uix.init();
     });
 </script>
 <link rel="stylesheet" href="assets/uix.css">

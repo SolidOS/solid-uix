@@ -32,7 +32,7 @@ body {
 .content {
   padding:1rem;
   flex-grow:1;
-  overflow:scroll;
+//  overflow:scroll;
 }
 #helpMenu {
   position:absolute;
@@ -75,11 +75,16 @@ body {
   background:#008080 !important; // teal
 }
 body {
-overflow:auto;
-overflow-y:auto;
+//overflow:auto;
 }
 .content {
-  overflow:auto;
+overflow:auto;
+}
+#pluginArea {
+//
+}
+#pluginArea > DIV > DIV {
+//height:calc(100% - 699px ) !important;
 }
 #page {
 //  display:grid;
@@ -113,6 +118,18 @@ overflow-y:auto;
 .podOwnerDescription {
   text-align:center;
   margin-right:1rem;
+}
+[data-uix=currentPage] {
+  padding:0.75rem;
+  padding-right:0;
+  width: calc(100% - 0.75rem);
+//  box-model:border-box;
+  background:#004040;
+  height:1.5rem;
+  color: #99ffff !important;
+}
+.content {
+//height:100%;
 }
 
 div[data-uix="solidLogin"] {
@@ -200,14 +217,21 @@ div[data-uix="solidLogin"] input:hover,
   margin-top:0.25rem;
   margin-bottom:1rem;
 }
+#userPanel {
+//  position:fixed;
+}
 #userPanel textarea {
   width:23rem;
 }
 #userPanel h3 {
+/*
   border-radius:0.2rem;
   padding-top:0.5rem !important;  
   padding-bottom:0.5rem !important;  
   margin-bottom:0.25rem !important;  
+*/
+  border-radius:0.2rem;
+  margin-top:1rem !important;
   font-weight:500 !important;
   background:#99dddd !important;
 }
