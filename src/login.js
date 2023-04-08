@@ -1,7 +1,7 @@
 const authSession = UI.authn.authSession;
 const loginButtonArea = document.querySelector("[data-uix=solidLogin]");
 
-const inDataKitchen=true;
+const inDataKitchen=false;
 if(inDataKitchen){
   var port =3101;
   var host = `http://localhost:${port}`;
@@ -44,9 +44,7 @@ export async function initLogin(loginType){
     loginButtonArea.appendChild(UI.login.loginStatusBox(document, null, {}));
     const signupButton = loginButtonArea.querySelectorAll('input')[1];
     if(signupButton) signupButton.style.display="none";
-//    let me = await UI.authn.checkUser();
-    let me = await UI.authn.currentUser();
-
+    let me = inDataKitchen ?await UI.authn.currentUser() :await UI.authn.checkUser();
     let button = loginButtonArea.querySelector('input');         
     let dataset = loginButtonArea.dataset;
     let inLabel = dataset.inlabel;

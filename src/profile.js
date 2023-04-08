@@ -41,9 +41,20 @@ export class ProfileSession {
 
 export class Profile {
 
+  async ensureLibraries(){
+    if(typeof $rdf!="undefined" && typeof ns!="undefined") return;
+    else {
+      $rdf = await import('../node_modules/rdflib/lib/index.js');
+      const pkg = await import('../node_modules/solid-namespace/index.js');
+      ns = pkg.default($rdf);
+console.log(99, ns.solid(''))
+    }
+  }
+
   async init(webid){
     if(!webid) return null;
     const originalWebid = webid;
+    await this.ensureLibraries();
     try { this.webid = $rdf.sym(webid); }
     catch(e){
       try { 

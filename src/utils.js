@@ -6,10 +6,12 @@ export function bestLabel(node){
     const best = UI.store.any(node,UI.ns.ui('label'))   
         || UI.store.any(node,UI.ns.dct('title'))   
         || UI.store.any(node,UI.ns.rdfs('label'))   
+        || UI.store.any(node,UI.ns.foaf('name'))   
+        || UI.store.any(node,UI.ns.vcard('fn'))   
         || UI.utils.label(node);
     return best;
   }
-  catch(e) { alert(e); return node }
+  catch(e) { console.log(e); return node }
 }
 
 export function parsePredicatePhrase(string,baseUrl,element){
@@ -69,6 +71,15 @@ export function getNodeFromFieldValue(fieldSelector,key){
    catch(e){ console.log(e) }
 }
 
+
+export async function str2stm(querystring,source){
+   let stmt = []
+   for(let i of querystring.split(/\s+/,3)){
+      stmt.push(string2node(i,param))     
+   }
+   source = UI.rdf.sym(source);
+   return UI.rdf.st( stmt[0],stmt[1],stmt[2],source );
+}
 
 
 
