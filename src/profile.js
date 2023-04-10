@@ -1,18 +1,13 @@
-import * as util from './utils.js';
-var store,$rdf,ns;
-var store = typeof UI != "undefined" ?UI.store :null;
-var $rdf = typeof UI != "undefined" ?UI.rdf :null;
-var ns = typeof UI != "undefined" ?UI.ns :null;
+import * as util from '../src/utils.js';
 
 export class ProfileSession {
 
-  constructor(suppliedStore,suppliedNS){
-    if(suppliedStore){
-      if(suppliedNS){  // command-line : use supplied $rdf and ns objects
-        ns = suppliedNS;
-        $rdf = suppliedStore;
-        store = $rdf.graph();
-        store.fetcher = $rdf.fetcher(store)
+  constructor(options){
+    options ||= {};
+    if(options.nowarnings) {
+      console.warn = (err)=> {
+        if(err.match(/unauthenticated/i)) return;
+        console.error((err && err.stack) ? err.stack : err);
       }
     }
     this.profile = {};
@@ -20,14 +15,12 @@ export class ProfileSession {
     this.user = "";
     this.owner = "";
   }
-
   async loggedInUser(){
     let u = UI.authn.currentUser();
     if(!u) return;
     u = await this.add(u.value);
     return u
   }
-
   async add(webid) {
     if(!this.visited[webid]) {
       if(!webid) return;
@@ -41,70 +34,58 @@ export class ProfileSession {
 
 export class Profile {
 
-  async ensureLibraries(){
-    if(typeof $rdf!="undefined" && typeof ns!="undefined") return;
-    else {
-      $rdf = await import('../node_modules/rdflib/lib/index.js');
-      const pkg = await import('../node_modules/solid-namespace/index.js');
-      ns = pkg.default($rdf);
-console.log(99, ns.solid(''))
-    }
-  }
-
   async init(webid){
     if(!webid) return null;
     const originalWebid = webid;
-    await this.ensureLibraries();
-    try { this.webid = $rdf.sym(webid); }
+    await util.initLibraries();
+    try { this.webid = util.sym(webid); }
     catch(e){
       try { 
-        await UI.store.fetcher.load(webid);
-        this.webid = $rdf.literal(webid);
+        await util.load(webid);
+        this.webid = util.literal(webid);
         this.context = {webid:this.webid}
         return this;
       }
       catch(e){
-        console.log("Could not load "+webid);
+        console.warn("Could not load "+webid);
       }
     }
-    this.context = await harvestProfile(webid);
+    this.context = await harvestProfile(webid,this);
     return this;
   }
 
-
   // these return strings
   //
-  get(requestString,element){
-    if( shortcut[requestString] ) return getShortcut(this,requestString,element);
-    let result = _getProperty(this.webid,requestString);
+  get(predicateString){
+    if( shortcut[predicateString] ) return getShortcut(this,predicateString);
+    let result = this.nget(this.webid,predicateString)
     return result ?result.value :null;
   }
-  getall(requestString,element){
-    if( shortcut[requestString] ) return getShortcut(this,requestString,element);
-     let results = _getProperties(this.webid,requestString);
+  getall(requestString){
+     if( shortcut[requestString] ) return getShortcut(this,requestString,element);
+     let results = this.ngetAll(this.webid,requestString);
      for(let r in results){results[r]=results[r].value;}
      return results;
   }
-
-  // these return nodes
-  //
-  nget(requestString){
-    if( shortcut[requestString] ) return getShortcut(this,requestString,element);
-    return _getProperty(this.webid,requestString);
+  nget(subjectNode,predicateString){
+    let predicateNode = util.str2node(predicateString,subjectNode.value)
+    if(!predicateNode) return;
+    return util.any(subjectNode,predicateNode);
   }
-  ngetall(requestString){
-    if( shortcut[requestString] ) return getShortcut(this,requestString,element);
-    return _getProperties(this.webid,requestString);
+  ngetAll(subjectNode,predicateString){
+    let predicateNode = util.str2node(predicateString,subjectNode.value)
+    if(!predicateNode) return;
+    return util.each(subjectNode,predicateNode);
   }
 
 getName(c){
-      c = $rdf.sym(c);
-      return  (store.any(c, ns.vcard('fn'))||"").value  
-              || (store.any(c, ns.foaf('name'))||"").value 
-              || (store.any(c, ns.dct('title'))||"").value 
-              || (store.any(c, ns.rdfs('label'))||"").value 
-              || (store.any(c, ns.ui('label'))||"").value 
-              || util.bestLabel(c.value);   
+      c = util.sym(c);
+      return  (util.any(c, util.curie('vcard:fn'))||"").value  
+              || (util.any(c, util.curie('foaf:name'))||"").value 
+              || (util.any(c, util.curie('dct:title'))||"").value 
+              || (util.any(c, util.curie('rdfs:label'))||"").value 
+              || (util.any(c, util.curie('ui:label'))||"").value 
+              || c.value 
 }
 async getAllWithNames(requestString,element){
   let results = [];
@@ -113,14 +94,16 @@ async getAllWithNames(requestString,element){
     for(let instance of getShortcut(this,requestString,element)){
       let link = instance.link;
       let label = this.getName(instance.link);
-      results.push({link,label});
+      let row = {link};
+      if(label) row.label = label;
+      results.push(row);
     }
   }
   else if(requestString==='friends') predicate = predicate = 'foaf:knows';
   else if(requestString==='communities') predicate = 'solid:community';
   if(predicate){
     for(let c of this.getall(predicate)){
-      await store.fetcher.load(c);
+      await util.load(c);
       let link = c;
       let label = this.getName(c);
       results.push({label,link});
@@ -128,6 +111,8 @@ async getAllWithNames(requestString,element){
   }
   return results;
 }
+  getWithNames = this.getAllWithNames;
+
 }
 
 const shortcut = {
@@ -148,7 +133,7 @@ const shortcut = {
 
 function getShortcut(self,req,element){
   if(req.match(/^label/)) return self.get('ui:label')||self.get('dct:title');
-  if(req.match(/^webid/)) return self.webid.value;
+  if(req.match(/^webid/)) { return self.webid.value || self.webid;}
   if(req.match(/^photo/)) return self.get('vcard:hasPhoto');
   if(req.match(/^role/)) return self.getall('vcard:role');
   if(req.match(/^inbox/)) return self.get('ldp:inbox');
@@ -171,23 +156,28 @@ function getShortcut(self,req,element){
   if(req.match(/^instances/)){
     let instanceArray = [];
     let pti = self.context.publicTypeIndex;
-    let instances = store.match(null,ns.solid('forClass'),null,pti);
+    let instances = util.match(null,util.curie('solid:forClass'),null,pti);
     for(let i of instances){
       let classObj = i.object;
-      const where = element ?(util.string2node(element.dataset.where)||{}).value :null;
+      let where = (element && element.dataset) ?(util.str2node(element.dataset.where)||{}).value :null;
       if(!where ||(where && where===classObj.value)){
-        let instance = store.any(i.subject,ns.solid('instance'),null,pti);
-        if(instance) instanceArray.push({label:util.bestLabel(classObj),link:instance.value,forClass:classObj.value});
+        let instance = util.any(i.subject,util.curie('solid:instance'),null,pti);
+        if(!instance) continue;
+        const row ={link:instance.value,forClass:classObj.value};
+//        const label = util.bestLabel(classObj,store,ns);
+let label;
+        if(label) row.label = label;
+        instanceArray.push(row);
       }
     }
     return instanceArray;
   }
 }
 
-export async function harvestProfile(webid) {
-  let wantedUser = await constructContext(webid);
+export async function harvestProfile(webid,self) {
+  let wantedUser = await constructContext(webid,self);
   if(wantedUser.error) { 
-    wantedUser = $rdf.literal(webid);
+    wantedUser = util.literal(webid);
     return wantedUser;
   }
   if(wantedUser.publicTypeIndex) await _tryLoad(wantedUser.publicTypeIndex);
@@ -196,10 +186,11 @@ export async function harvestProfile(webid) {
   return wantedUser;
 }
 
-async function constructContext(webidString){
+async function constructContext(webidString,self){
   let webid = await _findWebid(webidString);
   let context = {};
-  const user = webid || loggedInUser;
+  let user = webid // || self.loggedInUser();
+  user = user.value ?user :util.sym(user);
   context = {
     webid: user,
     publicProfile: user.doc ?user.doc() :null,
@@ -207,9 +198,9 @@ async function constructContext(webidString){
   if(!await _tryLoad(context.publicProfile) ){
     context.error = `Could not load ${context.publicProfile}`;
   }
-  context.publicTypeIndex = _getProperty(context.webid,'solid:publicTypeIndex');
-  context.preferencesFile =  _getProperty(context.webid,'space:preferencesFile');
-  context.privateTypeIndex = _getProperty(context.webid,'solid:privateTypeIndex');
+  context.publicTypeIndex = self.nget(context.webid,'solid:publicTypeIndex');
+  context.preferencesFile =  self.nget(context.webid,'space:preferencesFile');
+  context.privateTypeIndex = self.nget(context.webid,'solid:privateTypeIndex');
   return context;
 }
 
@@ -219,39 +210,19 @@ async function constructContext(webidString){
  * @return {NamedNode|undefined} - the namedNode for the resource
  */
   async function _tryLoad(url){
-    if(!url) return console.log("No URL supplied to tryLoad().");
+    if(!url) return console.warn("No URL supplied to tryLoad().");
     const namedNode = url.value;
-    try { namedNode ||= $rdf.sym(url); }
-    catch(e){ return console.log(`sym failed for '${url}' : ${e}`); }
+    try { namedNode ||= util.sym(url); }
+    catch(e){ return console.warn(`sym failed for '${url}' : ${e}`); }
     try {
-      await store.fetcher.load(namedNode);
+      await util.load(namedNode);
       return namedNode;
     }
-    catch(e){ return console.log(`load failed for '${url}': ${e}.`); }
+    catch(e){ return console.warn(`load failed for '${url}': ${e}.`); }
   }
-
-function _getProperties(subject,curie){
-    let [vocab,predicate] = curie.split(/:/);
-    if(!predicate) return;
-    predicate = ns[vocab] ?ns[vocab](predicate) :$rdf.sym(predicate);
-    let results = store.each(subject,predicate);
-    return results
-}
-function _getProperty(subject,curie){
-    let [vocab,predicate] = curie.split(/:/);
-    if(!predicate) return;
-    predicate = ns[vocab] ?ns[vocab](predicate) :$rdf.sym(predicate);
-    return store.any(subject,predicate);
-}
-function _getValue(subect,predicate){
-    let node = _getProperty(subject,predicate);
-    return node ?node.value :"";
-}
 async function _findWebid(webid){
-    webid = webid || window.origin+'/profile/card#me';
-    try {  return $rdf.sym(webid);  }
+    webid = webid || await localWebId();
+    try {  return util.sym(webid);  }
     catch(e){ return webid; }
     // TBD - traverse folders
 }
-
-

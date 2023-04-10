@@ -6,35 +6,35 @@
 <http://www.w3.org/ns/auth/acl>
   a owl:Ontology ;
   rdfs:label "Basic Access Control" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   ui:transform "rdf" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/auth/acl#" ;
   vann:preferredNamespacePrefix "acl:" .
 
 <https://www.w3.org/ns/activitystreams>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Activity Streams"@en ;
   vann:preferredNamespaceURI "https://www.w3.org/ns/activitystreams#" ;
   vann:preferredNamespacePrefix "as:" .
 
 <http://creativecommons.org/ns>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Creative Commons" ;
   vann:preferredNamespaceURI "http://creativecommons.org/ns#" ;
   vann:preferredNamespacePrefix "cc:" .
 
 <http://www.w3.org/ns/auth/cert>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Cert" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/auth/cert#" ;
   vann:preferredNamespacePrefix "cert:" .
 
 <http://purl.org/dc/elements/1.1/>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Dublin Core Elements"@en ;
   vann:preferredNamespaceURI "http://purl.org/dc/elements/1.1/" ;
   vann:preferredNamespacePrefix "elements:" .
@@ -47,7 +47,7 @@
 
 <http://www.geonames.org/ontology>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "GeoNames" ;
   vann:preferredNamespaceURI "http://www.geonames.org/ontology" ;
   vann:preferredNamespacePrefix "geo:" .
@@ -55,34 +55,34 @@
 <http://www.w3.org/2007/ont/http>
   a owl:Ontology ;
   rdfs:label "HTTP" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/2007/ont/http#" ;
   vann:preferredNamespacePrefix "http:" .
 
 <http://www.w3.org/2007/ont/httph>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "HTTPH" ;
   vann:preferredNamespaceURI "http://www.w3.org/2007/ont/httph#" ;
   vann:preferredNamespacePrefix "httph:" .
 
 <https://www.w3.org/ns/iana/media-types/>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Media Types" ;
   vann:preferredNamespaceURI "https://www.w3.org/ns/iana/media-types/" ;
   vann:preferredNamespacePrefix "iana:" .
 
 <http://www.w3.org/2002/12/cal/ical>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "iCal" ;
   vann:preferredNamespaceURI "http://www.w3.org/2002/12/cal/ical" ;
   vann:preferredNamespacePrefix "ical:" .
 
 <http://www.w3.org/ns/ldp>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Linked Data Platform" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/ldp#" ;
   vann:preferredNamespacePrefix "ldp:" .
@@ -90,20 +90,20 @@
 <http://www.w3.org/ns/pim/meeting>
   a owl:Ontology ;
   rdfs:label "Meeting" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/ns/pim/meeting#" ;
   vann:preferredNamespacePrefix "mee:" .
 
 <http://purl.org/ontology/mo/>
   a owl:Ontology ;
   rdfs:label "Music" ;
-  ui:dataFormat "";
+  ui:linktype "";
   vann:preferredNamespaceURI "http://purl.org/ontology/mo/" ;
   vann:preferredNamespacePrefix "mo:" .
 
 <http://www.w3.org/2002/07/owl>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "Web Ontology Language (OWL)" ;
   vann:preferredNamespaceURI "http://www.w3.org/2002/07/owl#" ;
   vann:preferredNamespacePrefix "owl:" .
@@ -111,20 +111,20 @@
 <http://www.w3.org/ns/posix/stat>
   a owl:Ontology ;
   rdfs:label "Stat" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/ns/posix/stat#" ;
   vann:preferredNamespacePrefix "posix:" .
 
 <http://www.w3.org/1999/02/22-rdf-syntax-ns>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "RDF Syntax" ;
   vann:preferredNamespaceURI "http://www.w3.org/1999/02/22-rdf-syntax-ns#" ;
   vann:preferredNamespacePrefix "rdf:" .
 
 <http://www.w3.org/2000/01/rdf-schema>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "RDF Schema" ;
   vann:preferredNamespaceURI "http://www.w3.org/2000/01/rdf-schema#" ;
   vann:preferredNamespacePrefix "rdfs:" .
@@ -137,42 +137,42 @@
 
 <https://schema.org/>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Schema" ;
   vann:preferredNamespaceURI "https://schema.org/" ;
   vann:preferredNamespacePrefix "schema:" .
 
 <http://rdfs.org/sioc/ns>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Socially Inter-linked Online Communities " ;
   vann:preferredNamespaceURI "http://rdfs.org/sioc/ns#" ;
   vann:preferredNamespacePrefix "sioc:" .
 
 <http://www.w3.org/2004/02/skos/core>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Simple Knowledge Organization System" ;
   vann:preferredNamespaceURI "http://www.w3.org/2004/02/skos/core#" ;
   vann:preferredNamespacePrefix "skos:" .
 
 <http://www.w3.org/ns/solid/terms>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Solid Terms" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/solid/terms#" ;
   vann:preferredNamespacePrefix "solid:" .
 
 <http://www.w3.org/ns/pim/space>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "Workspace" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/pim/space#" ;
   vann:preferredNamespacePrefix "space:" .
 
 <http://purl.org/dc/terms/>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "Dublin Core Terms"@en ;
   vann:preferredNamespaceURI "http://purl.org/dc/terms/" ;
   vann:preferredNamespacePrefix "terms:" .
@@ -180,27 +180,27 @@
 <http://www.w3.org/2006/time>
   a owl:Ontology ;
   rdfs:label "Time" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/2006/time#" ;
   vann:preferredNamespacePrefix "time:" .
 
 <http://www.w3.org/2006/timezone>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "Timezone" ;
   vann:preferredNamespaceURI "http://www.w3.org/2006/timezone#" ;
   vann:preferredNamespacePrefix "tzont:" .
 
 <http://www.w3.org/ns/ui>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "User Interface" ;
   vann:preferredNamespaceURI "http://www.w3.org/ns/ui#" ;
   vann:preferredNamespacePrefix "ui:" .
 
 <https://www.w3.org/2006/vcard/ns>
   a owl:Ontology ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   rdfs:label "vCard"@en ;
   vann:preferredNamespaceURI "https://www.w3.org/2006/vcard/ns#" ;
   vann:preferredNamespacePrefix "vcard:" .
@@ -208,20 +208,20 @@
 <http://www.w3.org/2003/01/geo/wgs84_pos>
   a owl:Ontology ;
   rdfs:label "Basic Geo" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/2003/01/geo/wgs84_pos#" ;
   vann:preferredNamespacePrefix "wgs84_pos:" .
 
 <http://www.w3.org/2005/01/wf/flow>
   a owl:Ontology ;
   rdfs:label "Issue Tracking" ;
-  ui:dataFormat "SolidOSLink";
+  ui:linktype "SolidOS";
   vann:preferredNamespaceURI "http://www.w3.org/2005/01/wf/flow#" ;
   vann:preferredNamespacePrefix "wf:" .
 
 <http://www.w3.org/2001/XMLSchema>
   a owl:Ontology ;
-  ui:dataFormat "";
+  ui:linktype "";
   rdfs:label "XML Schema" ;
   vann:preferredNamespaceURI "http://www.w3.org/2001/XMLSchema#" ;
   vann:preferredNamespacePrefix "xsd:" .

@@ -1,0 +1,13 @@
+<div data-source="https://solidos.solidcommunity.net/profile/card#me">
+
+   <h3 data-uix="podOwnerName"></h3> 
+   <div data-uix="podOwnerPronouns"></div> 
+   <ul data-uix="podOwnerInstances"></ul>
+
+</div>
+<script src="../../solidos/workspaces/mashlib/dist/mashlib.js" type="module">
+</script>
+<script type="module"> 
+    import {UIX} from '../src/uix-core.js';
+    document.addEventListener('DOMContentLoaded',async()=>{ (new UIX()).init(); });
+</script>

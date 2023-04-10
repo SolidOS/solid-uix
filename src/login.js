@@ -1,25 +1,11 @@
-const authSession = UI.authn.authSession;
-const loginButtonArea = document.querySelector("[data-uix=solidLogin]");
-
-const inDataKitchen=false;
-if(inDataKitchen){
-  var port =3101;
-  var host = `http://localhost:${port}`;
-  window.SolidAppContext = {
-    noAuth : host,
-     webId : host + "/profile/card#me",
-       app : host,
-  };
-  window.$SolidTestEnvironment = {
-    iconBase : "/common/icons/",
-    originalIconBase : "/common/originalIcons/",
-  };
-}
-
-window.SolidAppContext ||= {};
-window.SolidAppContext.scroll = "212"
+import * as util from './utils.js';
+let authSession, loginButtonArea;
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    if(typeof UI === "undefined") return;
+    authSession = UI.authn.authSession;
+    loginButtonArea = document.querySelector("[data-uix=solidLogin]");
 
     if(authSession && loginButtonArea) {
         loginButtonArea.style.display="none";
@@ -37,14 +23,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
 }); 
 
+function setAppContext(){
+  if(window.inDataKitchen){
+    window.SolidAppContext = {
+        noAuth : window.origin,
+         webId : window.origin + "/profile/card#me",
+           app : window.origin,
+    };
+    window.$SolidTestEnvironment = {
+        iconBase : "/common/icons/",
+        originalIconBase : "/common/originalIcons/",
+    };
+  }
+  window.SolidAppContext ||= {};
+  window.SolidAppContext.scroll = "212"
+}
+
 export async function initLogin(loginType){
+    setAppContext();
     const self=this;
     if(!loginButtonArea){return;}
     loginButtonArea.innerHTML="";
     loginButtonArea.appendChild(UI.login.loginStatusBox(document, null, {}));
     const signupButton = loginButtonArea.querySelectorAll('input')[1];
     if(signupButton) signupButton.style.display="none";
-    let me = inDataKitchen ?await UI.authn.currentUser() :await UI.authn.checkUser();
+    let me = await UI.authn.checkUser();
     let button = loginButtonArea.querySelector('input');         
     let dataset = loginButtonArea.dataset;
     let inLabel = dataset.inlabel;
@@ -63,6 +66,7 @@ export async function initLogin(loginType){
         loginButtonArea.style.display="inline-block";
         button.value = inLabel || "Log in!";           
         button.title = "--- click to log in!";
-        if(note) note.style.display="block";
+        if(note && !await util.localWebid()) note.style.display="block";
+        else if(note) note.style.display="none";        
     }
 }      

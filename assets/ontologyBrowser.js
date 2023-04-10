@@ -11,12 +11,14 @@ async function runPlugin (UI,uix){
   }
   catch(e){console.log(e)}
   const vann = UI.rdf.Namespace('http://purl.org/vocab/vann/');
-  for(let ont of UI.store.each(null,UI.ns.rdf('type'),UI.ns.owl('Ontology'),data)){
+  let ontologies = UI.store.each(null,UI.ns.rdf('type'),UI.ns.owl('Ontology'),data);
+  for( let ont of ontologies ){
     const li = document.createElement('LI');
     const anchor = document.createElement('A');
     const label =  UI.store.any(ont,UI.ns.rdfs('label'),null,data);
     const nsUri = UI.store.any(ont,vann('preferredNamespaceURI'));
     const nsPrefix = UI.store.any(ont,vann('preferredNamespacePrefix'));
+    const format = UI.store.any(ont,UI.ns.ui('linktype'));
     if(!label) continue;
     anchor.href = ont.value;
     anchor.innerHTML = label ?label.value :"";
@@ -24,7 +26,15 @@ async function runPlugin (UI,uix){
     anchor.style="text-decoration:none;font-size:100% !important;";
     anchor.addEventListener('click',async(e)=>{
       e.preventDefault();
-      iframe.src = e.target.href;
+       anchor.dataset.linktype=format;
+       uix.show(anchor.href,iframe);
+/*
+if(format&&format==="SolidOSLink"){
+      let r = await window.fetch(anchor.href);
+      iframe.srcdoc = "<pre>"+await r.text()+"</pre>";
+}
+else      iframe.src = e.target.href;
+*/
     });
     const txt = document.createElement('DIV');
     txt.innerHTML = `${nsPrefix} ${nsUri}`;

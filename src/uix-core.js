@@ -1,22 +1,127 @@
+import * as util from '../src/utils.js';
+import {show} from "./display.js";
 import {ProfileSession} from "./profile.js";
 import {initLogin} from "./login.js";
 import {processPlugin,processStandAlonePlugin} from "./plugins.js";
-import * as util from './utils.js';
 
+// REMOVE THIS FOR PRODUCTION !!
+window.inDataKitchen = false;
+
+/*
+methods
+  init
+  initVariables
+  process
+  processVariable
+  processQuery
+  processAction
+  showForm
+  showSolidOSlink
+  showInElement
+  toggleUserPanel
+  refreshPodOwner
+properties
+  uixType
+  solidVar
+*/
 export class UIX {
 
   constructor(){
     this.profileSession = new ProfileSession();
     this.initLogin = initLogin.bind(this);
+    this.show = show.bind(this);
     this.processPlugin = processPlugin.bind(this);
     this.processStandAlonePlugin = processStandAlonePlugin.bind(this);
   }
-
   async init(){
-    await this.initLogin();
+    if(typeof UI !="undefined") await this.initLogin();
     await this.initVariables();
     this.toggleUserPanel(this.podOwner);
   }
+  async initVariables(elementToInit){
+    elementToInit ||= document.body;
+    let actionElements = elementToInit.querySelectorAll('[data-uix]') || [];
+    for(let actionElement of actionElements){
+      await this.process(actionElement);
+    }
+  }
+  async process(element){
+    if(typeof element==="string"){
+      element = document.getElementById(element.replace(/^#/,''));
+    }
+    if(!element.dataset) return;
+    let actionVerb = (element.dataset.uix).toLowerCase();
+    let actionType = uixType[actionVerb] || "";
+    if(actionType==="query") return this.processQuery(element);
+    else if(actionType==="action") return this.processAction(element);
+    else if(actionVerb==="standAlonePlugin") return this.processStandAlonePlugin(element);
+    else return this.processVariable(element);
+  }  
+
+// CREATE/REFRESH USER & PODOWNER MENUS
+//
+  async toggleUserPanel(podOwner){
+    const userPanel = document.getElementById('userPanel');
+    const menuToggle = document.getElementById('userMenuToggle');
+    const ownerMenu = document.querySelector('.podOwnerMenu');
+    if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
+    if(!userPanel) return;
+    let user = (typeof UI !="undefined") ?UI.authn.currentUser() :null;
+    user ||= await util.localWebid();
+    this.podOwner ||= await util.localWebid();
+    function toggleVis(e){
+      let target = document.getElementById('userPanel');
+      if(target) target.classList.toggle('hidden')
+    }
+    if(user) {
+      menuToggle.style.opacity="100%";
+      menuToggle.style.cursor="pointer";
+      if(this.podOwner){
+        let owner = await this.profileSession.add(this.podOwner);
+        let home = owner.get('storages')[0];
+        menuToggle.addEventListener('click',toggleVis)
+        await this.show(home,{dataset:{linktype:"SolidOS",uix:'podOwnerHome',pane:"folder"}});
+//        await this.showSolidOSlink(home,{dataset:{uix:'podOwnerHome',pane:"folder"}});
+      }
+    }
+    else {
+      menuToggle.style.opacity="50%";
+      menuToggle.style.cursor="default";
+      menuToggle.removeEventListener('click',toggleVis)
+    }
+  }
+  async refreshPodOwner(webid,element){
+    /** 
+         Refresh the podOwner areas: name,role,pronouns,photo,podOwnerMenu
+         But only when needed
+    **/
+    const action = element && element.dataset ?element.dataset.uix :"";
+    const isPodAction = action.match(/^podOwner/i);
+    const isUserAction = action.match(/^user/i) && !action.match(/(communities|friends)/i);
+    const user = typeof UI != "undefined" ?(UI.authn.currentUser()||"").value :null;
+    this.podOwner ||= user;
+    this.podOwner ||= await util.localWebid();
+    if(!webid) return;                // no new owner, so no refresh
+    if(isPodAction) return;           // action is by existing podOwner, so no refresh
+    if(isUserAction) webid=user;
+    if(webid===this.podOwner) return; // new owner is already pod owner, so no refresh
+    /**
+       Okay, let's refresh
+    **/
+    this.podOwner = webid;
+    let actionElements = document.body.querySelectorAll('[data-uix]') || [];
+    for(let actionElement of actionElements){
+      let act = actionElement.dataset.uix;
+      if(act.match(/^podOwner/i)){
+        if(act.match(/(name|pronouns|role)/i)) actionElement.innerHTML="";
+        if(act.match(/photo/i)) actionElement.src="";
+        await this.process(actionElement);
+      }
+    }
+  }
+
+// WE HAVE THE DATA, SHOW IT
+//
   async showInElement(actionElement,output){
     const self = this;
     let actionVerb=((actionElement.dataset.uix)||"").toLowerCase();
@@ -36,7 +141,9 @@ export class UIX {
           actionElement.addEventListener('click',async(e)=> {
             e.preventDefault();
             let subject = e.target.href;
-            this.showSolidOSlink(subject,actionElement);
+            actionElement.dataset.linktype="SolidOS";
+            this.show(subject,actionElement);
+            //this.showSolidOSlink(subject,actionElement);
           });
           // setStyle(actionElement,'buttonStyle');  // for example
           break;
@@ -53,7 +160,8 @@ export class UIX {
             actionElement.href = output;
             actionElement.addEventListener('click',async(e)=> {
               e.preventDefault();
-              this.showSolidOSlink(e.target.href,actionElement);
+              actionElement.dataset.linktype="SolidOS";
+              this.show(e.target.href,actionElement);
             });
           }
           break;
@@ -81,7 +189,7 @@ export class UIX {
             }
             else {
               opt.value = row;
-              opt.innerHTML = util.bestLabel(row);
+              opt.innerHTML = _bestLabel(row);
             }
             actionElement.appendChild(opt);
           }
@@ -104,7 +212,8 @@ export class UIX {
             }
             anchor.addEventListener('click',(e)=>{
               e.preventDefault();
-              this.showSolidOSlink(e.target.href,actionElement);
+              actionElement.dataset.linktype="SolidOS";
+              this.show(e.target.href,actionElement);
             });
             li.appendChild(anchor);
             actionElement.appendChild(li);
@@ -116,109 +225,11 @@ export class UIX {
 
 }
 
-  /** @param {string||NamedNode} subject   - address/node of the resource to load
-    @param {object}            opt         - optional hash containing 
-    @param {string?}         pane          - name of SolidOS pane for display
-    @param {string?}         outlineElement- id of outline element
-    @param {HTMLElement?}    dom           - document context of outline element
-   */
-  async showSolidOSlink(subject,element){
-    const opt = element.dataset || {};
-    if(!subject) return console.log("No subject supplied for SolidOSLink!");
-    subject = subject.uri ?subject :UI.rdf.sym(subject);
-    const params = new URLSearchParams(location.search)        
-    params.set('uri', subject.uri);                                    
-    let base = "http://localhost:3101/public/s/solid-uix/"
-    const o = panes.getOutliner(opt.dom || document);
-    await this.refreshPodOwner(subject.uri,element);
-    let currentPage = document.body.querySelector("[data-uix=currentPage]");
-    if(currentPage) currentPage.innerHTML = subject.uri;
-    let pane = opt.pane ?panes.byName(opt.pane) :null;
-    await o.GotoSubject(subject,true,pane,true,null,opt.outlineElement);
-    window.history.replaceState({}, '', `${base}?${params}`);  
-  }  
-
-  async toggleUserPanel(podOwner){
-    const userPanel = document.getElementById('userPanel');
-    const menuToggle = document.getElementById('userMenuToggle');
-    const ownerMenu = document.querySelector('.podOwnerMenu');
-    if(ownerMenu) ownerMenu.style.display = podOwner ?"block" :"none";   
-    if(!userPanel) return;
-    const user = UI.authn.currentUser();
-    function toggleVis(e){
-      let target = document.getElementById('userPanel');
-      if(target) target.classList.toggle('hidden')
-    }
-    if(user) {
-      menuToggle.style.opacity="100%";
-      menuToggle.style.cursor="pointer";
-      if(this.podOwner){
-        let owner = await this.profileSession.add(this.podOwner);
-        let home = owner.get('storages')[0];
-        menuToggle.addEventListener('click',toggleVis)
-        await this.showSolidOSlink(home,{dataset:{uix:'podOwnerHome',pane:"folder"}});
-      }
-    }
-    else {
-      menuToggle.style.opacity="50%";
-      menuToggle.style.cursor="default";
-      menuToggle.removeEventListener('click',toggleVis)
-    }
-  }
-  async refreshPodOwner(webid,element){
-    /** 
-         Refresh the podOwner areas: name,role,pronouns,photo,podOwnerMenu
-         But only when needed
-    **/
-    const action = element && element.dataset ?element.dataset.uix :"";
-    const isPodAction = action.match(/^podOwner/i);
-    const isUserAction = action.match(/^user/i) && !action.match(/(communities|friends)/i);
-    const user = (UI.authn.currentUser()||"").value;
-    this.podOwner ||= user;
-    if(!webid) return;                // no new owner, so no refresh
-    if(isPodAction) return;           // action is by existing podOwner, so no refresh
-    if(isUserAction) webid=user;
-    if(webid===this.podOwner) return; // new owner is already pod owner, so no refresh
-    /**
-       Okay, let's refresh
-    **/
-    this.podOwner = webid;
-    let actionElements = document.body.querySelectorAll('[data-uix]') || [];
-    for(let actionElement of actionElements){
-      let act = actionElement.dataset.uix;
-      if(act.match(/^podOwner/i)){
-        if(act.match(/(name|pronouns|role)/i)) actionElement.innerHTML="";
-        if(act.match(/photo/i)) actionElement.src="";
-        await this.process(actionElement);
-      }
-    }
-  }
-  async initVariables(elementToInit){
-    elementToInit ||= document.body;
-    let actionElements = elementToInit.querySelectorAll('[data-uix]') || [];
-    for(let actionElement of actionElements){
-      await this.process(actionElement);
-    }
-  }
-
-  async process(element){
-    if(typeof element==="string"){
-      element = document.getElementById(element.replace(/^#/,''));
-    }
-    if(!element.dataset) return;
-    let actionVerb = (element.dataset.uix).toLowerCase();
-    let actionType = uixType[actionVerb] || "";
-    if(actionType==="query") return this.processQuery(element);
-    else if(actionType==="action") return this.processAction(element);
-    else if(actionVerb==="standAlonePlugin") return this.processStandAlonePlugin(element);
-    else return this.processVariable(element);
-  }  
-
   async processVariable(element){
     let actionVerb = (element.dataset.uix).toLowerCase();
     if(actionVerb==="standaloneplugin") return this.processStandAlonePlugin(element);
     let actor,output;
-    const specifiedOwner = element.dataset.owner;
+    const specifiedOwner = element.dataset.source || element.parentNode.dataset.source;
     let v = actionVerb.toLowerCase();
     if(v.match(/^(edit|add)/)) v = 'user'+v;
     if(v.match(/^solid/)){
@@ -232,7 +243,8 @@ export class UIX {
       }
       else if(v.match(/^user/)){
         v = v.replace(/^user/,'');
-        actor = UI.authn.currentUser();
+        actor = typeof UI !="undefined" ?UI.authn.currentUser() :null;
+        actor ||= await util.localWebid();
       }
       if(!actor) return;
       actor = await this.profileSession.add(actor);
@@ -245,13 +257,13 @@ export class UIX {
     }
     if(output) await this.showInElement(element,output)
   }
-
   async processQuery(element){
     let queryString = element.dataset.query;
     let source =  element.dataset.endpoint;
     let param = element.dataset.paramelement;
-    param = param ?util.getNodeFromFieldValue(param) :null;
-    const matches = await util.string2statement(queryString,source,param);
+    param = param ?_getNodeFromFieldValue(param) :null;
+    if(param) queryString = queryString.replace(/\?/,param);
+    const matches = await util.str2stm(queryString,source);
     for(let mi in matches){
       matches[mi]={
         link: matches[mi].subject.value,
@@ -279,7 +291,7 @@ export class UIX {
     let subject = o.formSubject;
     let script = o.script || function(){};
     try {
-      subject = $rdf.sym(subject) ;
+      subject = UI.rdf.sym(subject) ;
       if(o.formString){
         UI.rdf.parse(o.formString,UI.store,o.form,'text/turtle');
       }
@@ -296,8 +308,19 @@ export class UIX {
 
   async processAction(element){
     let action = element.dataset.uix;
-    let user = UI.authn.currentUser();
+    let user = typeof UI != "undefined" ?UI.authn.currentUser() :null;
     let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action==='include'){
+      try{
+        let r = await UI.store.fetcher.webOperation('GET',element.dataset.source);
+        if(r.ok){
+          element.innerHTML = r.responseText;
+          this.initVariables(element);
+        }
+        else console.warn(r.message);
+      }
+      catch(e){ console.warn(e) }
+    }
     if(action==='quicknotes'){
 //      element.addEventListener('click',async (e)=>{
          await this.processPlugin('quicknotes',element);
@@ -346,7 +369,9 @@ export class UIX {
            let i = p.querySelector('SELECT') || p.querySelector('INPUT');
            subject = i.value;                             
         }
-        this.showSolidOSlink(subject,element);
+        element.dataset.linktype = "SolidOS";
+        this.show(subject,element);
+        // this.showSolidOSlink(subject,element);
       });
     }
     if(action==='toggleVisibility'){
@@ -388,13 +413,15 @@ export class UIX {
         pane = 'basicPreferences';
       }
       element.addEventListener(eventType,()=> {
-        this.showSolidOSlink(subject,{dataset:{uix:'userEditProfile',pane}});
+        this.show(subject,{dataset:{linktype:"SolidOS",uix:'userEditProfile',pane}});
+        //this.showSolidOSlink(subject,{dataset:{linktype:"SolidOS",uix:'userEditProfile',pane}});
       });
     }
   }
 }
 
   const uixType = {
+    include: "action",
     togglevisibility: "action",
     dropdown: "action",
     editprofile: "action",

@@ -1,89 +1,126 @@
-// import {setStyle} from '../style.js'; // maybe add later
+var $rdf,ns,store;
+export async function initLibraries(){
+  let libraries = await ensureLibraries();
+  $rdf = libraries.rdf;
+  ns = libraries.ns;
+  store = libraries.store;
+};
+initLibraries();
+/*
+str2stm
+str2node
+getNodeFromFieldValue
+bestLabel
+load, each, any, match, sym, literal, curie
+localWebid
+showIframesSrcDoc
+*/
+export async function localWebid(){
+  if(window.SolidAppContext.webId) return window.SolidAppContext.webId;
+  let local = window.origin + "/profile/card#me";
+  let r = await window.fetch(local);
+  if(r.status>199 && r.status<300) return local;
+}
 
-export function bestLabel(node){
-  try{
-    if(typeof node==="string")  node = UI.rdf.sym(node) ;
-    const best = UI.store.any(node,UI.ns.ui('label'))   
-        || UI.store.any(node,UI.ns.dct('title'))   
-        || UI.store.any(node,UI.ns.rdfs('label'))   
-        || UI.store.any(node,UI.ns.foaf('name'))   
-        || UI.store.any(node,UI.ns.vcard('fn'))   
-        || UI.utils.label(node);
-    return best;
+
+export function str2stm(querystring,source){
+  let s = []
+  querystring = querystring.trim();
+  const stmts = querystring.split(/\s+/);
+  const subject = stmts.shift();
+  const predicate = stmts.shift();
+  const object = stmts.join(" ");
+  for(let i of [subject,predicate,object]){
+    s.push(str2node(i,source))     
   }
-  catch(e) { console.log(e); return node }
+  return {subject:s[0],predicate:s[1],object:s[2],graph:$rdf.sym(source)};
 }
-
-export function parsePredicatePhrase(string,baseUrl,element){
-  let [predicate,object] = string.split(/\s+/,2);
-  return([ string2node(predicate), string2node(object) ]);
-}
-export  function string2node(string,param){
+export  function str2node(string,baseUrl){
     if(!string) return "";
     try {
       if(string===('*')){
          return null;
       } 
       else if(string.startsWith('<')){
-         return UI.rdf.sym( string.replace(/^</,'').replace(/>$/,'') );
+         return $rdf.sym( string.replace(/^</,'').replace(/>$/,'') );
       } 
       else if(string==="a") {
-        return UI.ns.rdf('type');
+        return ns.rdf('type');
       }
       else if(string.startsWith(':')) {
-        return UI.rdf.sym(baseUrl + string.replace(/^:/,'#') );
+        return $rdf.sym(baseUrl + string.replace(/^:/,'#') );
       }
       else if(string.match(/^bk:/)) {
         let href = 'http://www.w3.org/2002/01/bookmark#'+string.replace(/^bk:/,'');
-        return UI.rdf.sym(href);
+        return $rdf.sym(href);
       }
-      else if(string.match(/:/)) {
+      else if(string.match(/:/) && !string.match(/^(chrome:|http:)/i)) {
         let [vocab,term] = string.split(/:/);
-        if( UI.ns[vocab] && term ) return UI.ns[vocab](term);
+        if( ns[vocab] && term ) return ns[vocab](term);
       }
-      else if(string==='?') {
-        if(param) return UI.rdf.sym(param);
-        return getNodeFromFieldValue(element.dataset.paramelement);
+      else {
+        try {
+          let node = $rdf.sym(string);
+          return node;
+        }
+        catch(e) {
+          return $rdf.literal(string);
+        }
       }
-      else return UI.rdf.literal(string);
     }
     catch(e){ console.log(e); }
   }
-
-// expects queryString like "* a skos:Concept"
-export async function string2statement(querystring,source,param){
-   let stmt = []
-   for(let i of querystring.split(/\s+/,3)){
-      stmt.push(string2node(i,param))     
-   }
-   source = source.startsWith('http') ?source :window.origin+source;
-   source = UI.rdf.sym(source);
-   await UI.store.fetcher.load(source);
-   let matches = UI.store.match(stmt[0],stmt[1],stmt[2],source);
-   return matches;
+export async function load(...args){ return await store.fetcher.load(...args);}
+export function add(...args){ return store.add(...args);}
+export function remove(...args){ return store.remove(...args);}
+export function each(...args){ return store.each(...args);}
+export function any(...args){ return store.any(...args);}
+export function match(...args){ return store.match(...args);}
+export function sym(string){ return $rdf.sym(string); }
+export function literal(string){ return $rdf.sym(string); }
+export function curie(string) { 
+  let [vocab,term] = string.split(/:/);
+  return ns[vocab](term); 
 }
-
+function bestLabel(node){
+  try{
+    if(typeof node==="string")  node = UI.rdf.sym(node) ;
+    const best = store.any(node,ns.ui('label'))   
+        || store.any(node,ns.dct('title'))   
+        || store.any(node,ns.rdfs('label'))   
+        || store.any(node,ns.foaf('name'))   
+        || store.any(node,ns.vcard('fn'))
+        // || UI.utils.label(node);
+    return best;
+  }
+  catch(e) { console.log(e); return node }
+}
 export function getNodeFromFieldValue(fieldSelector,key){
    let paramField = document.getElementById( fieldSelector.replace(/^#/,'') );
    if(!paramField ) return;
    let param = paramField[paramField.selectedIndex]; // SELECT
-   try { return UI.rdf.sym(param); }
+   try { return sym(param); }
    catch(e){ console.log(e) }
 }
 
-
-export async function str2stm(querystring,source){
-   let stmt = []
-   for(let i of querystring.split(/\s+/,3)){
-      stmt.push(string2node(i,param))     
-   }
-   source = UI.rdf.sym(source);
-   return UI.rdf.st( stmt[0],stmt[1],stmt[2],source );
+/*
+  if we already loaded solid-ui or mashlib, use the UI object
+  else, dynamically load rdflib, and solid-namespace
+*/
+export async function ensureLibraries($rdf){
+  if(typeof UI != "undefined"){
+    return({
+      rdf: UI.rdf,
+      ns: UI.ns, 
+      store: UI.store,
+    });
+  }
+  else {
+    $rdf = await import('../node_modules/rdflib/lib/index.js');
+    const pkg = await import('../node_modules/solid-namespace/index.js');
+    const ns = pkg.default($rdf);
+    const store = $rdf.graph();
+    store.fetcher = $rdf.fetcher(store);
+    return({ rdf:$rdf, ns, store });
+  }
 }
-
-
-
-
-
-
-
