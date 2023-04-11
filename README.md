@@ -11,7 +11,7 @@ Please see this demo, a [complete reimagining of the SolidOS frontend](https://j
 A Solid UIX variable can be applied to any HTML tag like so:
 
 ```html
-<h1 data-uiv="podOwnerName"></h1>
+<h1 data-uix="podOwnerName"></h1>
 ```
 
 That snippet, when viewed, will show the name of the owner of the pod being visited as an h1 heading.  The name will be retrieved from the pod owner's profile and could be in the foaf:name or vcard:fn fields, you don't need to care about that.
@@ -21,8 +21,8 @@ That snippet, when viewed, will show the name of the owner of the pod being visi
 For HTML elements that accept multiple values (e.g. a list or a select), multiple values will be shown.  For example, if the pod owner has multiple storages, this will show all of them in the HTML structures indicated :
 
 ```html
-<ul data-uiv="podOwnerStorages"></ul>
-<select data-uiv="podOwnerStorages"></select>
+<ul data-uix="podOwnerStorages"></ul>
+<select data-uix="podOwnerStorages"></select>
 ```
 
 ### Multiple values in single-value elements
@@ -30,20 +30,20 @@ For HTML elements that accept multiple values (e.g. a list or a select), multipl
 If a variable returns multiple values and the varible is in a single-value context (e.g. a heading rather than a list), the default is to display the first value.  However, if you add the *data-format* attribute, the list of items will be shown as a comma-separated string :
 
 ```html
-<b data-uiv="podOwnerStorages" data-format="string"></b>
+<b data-uix="podOwnerStorages" data-format="string"></b>
 ```
 
 ### Referencing sources
 
 UIX variables can reference the owner of the pod being visited, the logged-in user, or any user defined in the HTML.  For example :
 
-* The current logged-in user's name - `<b data-uiv="userName"></b>`
+* The current logged-in user's name - `<b data-uix="userName"></b>`
 
-* The name of the owner of the pod being visited - `<b data-uiv="podOwnerName"></b>`
+* The name of the owner of the pod being visited - `<b data-uix="podOwnerName"></b>`
 
 * The name of the owner of any pod
 ```
-   <b     data-uiv = "podOwnerName" 
+   <b     data-uix = "podOwnerName" 
        data-source = "http://ex.org/profile/card#me"
    ></b>
 ```
@@ -80,5 +80,31 @@ More docs coming soon, here's the TL;DR ...
 * buttons can automatically submit the value of the closest select
 * selects can fire actions in other components
 
+
+
+## Supported Variables
+
+The following variables may be used with with either "user" or "podOwner" prepended.  For example "Name can be used as either podOwnerName or userName:
+
+Single-value : name, pronouns, photo, inbox, webid, home
+
+Multiple-value : roles, issuers, storages, instances, communities, friends
+
+These variables only apply to logged-in users:
+
+    editProfile, editPreferences
+
+These variables do not require a user-specifier :
+
+    solidLogo, solidLogin, 
+
+UIX variables can take parameters.  For example if you want to know the name of a pod different from the one you're visiting, you can do this:
+
+```html
+<b data-uiv="podOwnerStorages"
+   data-source="https://solidos.solidcommunity.net/profile/card#me"
+></b>
+
+```
 
 &copy; Jeff Zucker, 2023 all rights reserved; May be freely distributed under an MIT license.

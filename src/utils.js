@@ -24,6 +24,7 @@ export async function localWebid(){
 
 
 export function str2stm(querystring,source){
+  if(!source.match(/^(http|chrome)/)) source = window.origin + source;
   let s = []
   querystring = querystring.trim();
   const stmts = querystring.split(/\s+/);
@@ -50,6 +51,10 @@ export  function str2node(string,baseUrl){
       else if(string.startsWith(':')) {
         return $rdf.sym(baseUrl + string.replace(/^:/,'#') );
       }
+      else if(string.match(/^skos:/)) {
+         let href = "http://www.w3.org/2004/02/skos/core#"+string.replace(/^skos:/,'');
+       return sym(href);
+      }
       else if(string.match(/^bk:/)) {
         let href = 'http://www.w3.org/2002/01/bookmark#'+string.replace(/^bk:/,'');
         return $rdf.sym(href);
@@ -70,7 +75,11 @@ export  function str2node(string,baseUrl){
     }
     catch(e){ console.log(e); }
   }
-export async function load(...args){ return await store.fetcher.load(...args);}
+export async function load(uri){ 
+  uri = uri.value || uri;
+  if(!uri.match(/^(http|chrome)/)) uri = window.origin + uri;
+  return await store.fetcher.load(uri);
+}
 export function add(...args){ return store.add(...args);}
 export function remove(...args){ return store.remove(...args);}
 export function each(...args){ return store.each(...args);}
@@ -82,12 +91,14 @@ export function curie(string) {
   let [vocab,term] = string.split(/:/);
   return ns[vocab](term); 
 }
-function bestLabel(node){
+export function bestLabel(node){
+ let skosLabel = sym( "http://www.w3.org/2004/02/skos/core#prefLabel");
   try{
     if(typeof node==="string")  node = UI.rdf.sym(node) ;
     const best = store.any(node,ns.ui('label'))   
-        || store.any(node,ns.dct('title'))   
+        || store.any(node,skosLabel)   
         || store.any(node,ns.rdfs('label'))   
+        || store.any(node,ns.dct('title'))   
         || store.any(node,ns.foaf('name'))   
         || store.any(node,ns.vcard('fn'))
         // || UI.utils.label(node);
@@ -95,11 +106,17 @@ function bestLabel(node){
   }
   catch(e) { console.log(e); return node }
 }
+
+export function getSource(element){
+  return getNodeFromFieldValue(element.dataset.source) || getNodeFromFieldValue(element.dataset.sourcefrom);
+}
 export function getNodeFromFieldValue(fieldSelector,key){
+   if(!fieldSelector) return;
    let paramField = document.getElementById( fieldSelector.replace(/^#/,'') );
    if(!paramField ) return;
    let param = paramField[paramField.selectedIndex]; // SELECT
-   try { return sym(param); }
+   if(!param ) return;
+   try { return sym(param.value); }
    catch(e){ console.log(e) }
 }
 

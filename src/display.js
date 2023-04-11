@@ -1,9 +1,16 @@
 import * as util from './utils.js';
 
+/*
+  linktypes
+    HTML     (interpolates uix-values, then shows it)
+    SolidOS  (shows using SolidOS databrowser)
+    Text     (shows inside <code> tags)
+    Markdown (shows as HTML)
+*/
 export async function show(uri,element){
   let linktype = element.dataset.linktype
   let needsproxy = element.dataset.needsproxy;
-  if(needsproxy) uri = this.proxy || "https://solidcommunity.net/proxy?uri="+uri;
+  if(needsproxy) uri = this.proxy+uri;
   if(linktype==="SolidOS") return _showSolidOSLink(uri,element,this);
   let content;
   try {
@@ -15,10 +22,11 @@ export async function show(uri,element){
       content = await response.text();
     }
     content = content.replace(/X-Frame-Options/g,'');
+    if(linktype==="text/plain") content = `<pre>${content}</pre>`;
     if(needsproxy) uri = uri.replace(/^.*proxy\?uri=/,'');
     uri = new URL(uri);
     const b = uri ?`<base href="${uri.origin}${uri.pathname}">` :"";
-    element.srcdoc = `<body>${b}${content}</body>`
+    element.srcdoc = `<body>${b}${content}</body>`;
     element.scrollTo({ top: 0, behavior: "smooth" });
   }
   catch(e){ alert(uri+e); return; }

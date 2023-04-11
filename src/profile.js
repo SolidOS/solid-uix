@@ -21,23 +21,25 @@ export class ProfileSession {
     u = await this.add(u.value);
     return u
   }
-  async add(webid) {
+  async add(webid,options) {
     if(!this.visited[webid]) {
       if(!webid) return;
-      this.profile[webid] = await (new Profile()).init(webid) ;
+      this.profile[webid] = await (new Profile()).init(webid,options) ;
       this.visited[webid]=true;
     }
     return this.profile[webid];
   }
-  loadProfile = this.add;
+  load = this.add;
 }
 
 export class Profile {
 
-  async init(webid){
+  async init(webid,options){
     if(!webid) return null;
     const originalWebid = webid;
     await util.initLibraries();
+    if(options && options.includeSeeAlsos) this.includeSeeAlsos=true;
+console.log(this.includeSeeAlsos)
     try { this.webid = util.sym(webid); }
     catch(e){
       try { 
@@ -87,7 +89,7 @@ getName(c){
               || (util.any(c, util.curie('ui:label'))||"").value 
               || c.value 
 }
-async getAllWithNames(requestString,element){
+async getWithNames(requestString,element){
   let results = [];
   let predicate;
   if(requestString==='instances') {
@@ -111,8 +113,7 @@ async getAllWithNames(requestString,element){
   }
   return results;
 }
-  getWithNames = this.getAllWithNames;
-
+  
 }
 
 const shortcut = {
@@ -183,6 +184,16 @@ export async function harvestProfile(webid,self) {
   if(wantedUser.publicTypeIndex) await _tryLoad(wantedUser.publicTypeIndex);
   if(wantedUser.privateTypeIndex) await _tryLoad(wantedUser.privateTypeIndex);
   if(wantedUser.preferencesFile) await _tryLoad(wantedUser.preferencesFile);
+  if(self.includeSeeAlsos){
+    let sas = self.ngetAll(self.webid,'rdfs:seeAlso');
+    if(sas && sas.length){
+      self.seeAlsos = [];
+      for(let s of sas){
+        self.seeAlsos.push(s);
+        await util.load(s);
+      }
+    }
+  }
   return wantedUser;
 }
 

@@ -1,10 +1,11 @@
 import * as util from '../src/utils.js';
+import {rdfEasy} from "./rdf-easy.js";
 import {show} from "./display.js";
 import {ProfileSession} from "./profile.js";
 import {initLogin} from "./login.js";
+import {fetchAndParse} from "./rss.js";
 import {processPlugin,processStandAlonePlugin} from "./plugins.js";
 
-// REMOVE THIS FOR PRODUCTION !!
 window.inDataKitchen = false;
 
 /*
@@ -27,6 +28,7 @@ properties
 export class UIX {
 
   constructor(){
+    this.proxy = "https://solidcommunity.net/proxy?uri=";
     this.profileSession = new ProfileSession();
     this.initLogin = initLogin.bind(this);
     this.show = show.bind(this);
@@ -195,11 +197,13 @@ export class UIX {
           }
           if(actionElement.dataset.target){
             actionElement.addEventListener('change',()=>{
-              self.activate(actionElement.dataset.target);
+              let  el = actionElement.dataset.target.replace(/^#/,'');
+              self.process( document.getElementById(el) );
             });
           }
           break;
       case 'UL' :
+          actionElement.innerHTML="";
           for(let row of output){
             let li = document.createElement('LI');
             let anchor = document.createElement('A');
@@ -249,7 +253,7 @@ export class UIX {
       if(!actor) return;
       actor = await this.profileSession.add(actor);
       if(v.match(/(friends|communities|instances)/)){
-        output = await actor.getAllWithNames(v,element);
+        output = await actor.getWithNames(v,element);
       }
       else {
         output = actor.get(v,element);
@@ -260,14 +264,31 @@ export class UIX {
   async processQuery(element){
     let queryString = element.dataset.query;
     let source =  element.dataset.endpoint;
-    let param = element.dataset.paramelement;
-    param = param ?_getNodeFromFieldValue(param) :null;
+    try {
+      await util.load(source)
+    }
+    catch(e){console.log(e)}
+    let param = element.dataset.paramfrom;
+    let wanted = element.dataset.wantedproperty;
+    param = param ?util.getNodeFromFieldValue(param) :null;
     if(param) queryString = queryString.replace(/\?/,param);
-    const matches = await util.str2stm(queryString,source);
-    for(let mi in matches){
-      matches[mi]={
-        link: matches[mi].subject.value,
-        label: util.bestLabel(matches[mi].subject),
+    const s = util.str2stm(queryString,source);
+    let matches = util.each( s.subject,s.predicate,s.object,s.graph );
+    for(let i in matches){
+      if(wanted){
+        const s1 = util.str2stm(`${matches[i].value} ${wanted} *`,source);
+        const label = util.bestLabel(matches[i]);
+        matches[i] = util.any( s1.subject,s1.predicate,s1.object,s1.graph );
+        matches[i]={
+          link: matches[i].value,
+          label,
+        }
+      }      
+      else {
+        matches[i]={
+          link: matches[i].value,
+          label: util.bestLabel(matches[i]),
+        }
       }
     }
     if(matches) await this.showInElement(element,matches)
@@ -310,6 +331,13 @@ export class UIX {
     let action = element.dataset.uix;
     let user = typeof UI != "undefined" ?UI.authn.currentUser() :null;
     let eventType = element.tagName==='SELECT' ?'change' :'click';
+    if(action==='rss'){
+      let so = (util.getSource(element)||{}).value ;
+      if(!so) return;
+      let output = await fetchAndParse( so );
+      if(output) await this.showInElement(element,output)
+      return;
+    }
     if(action==='include'){
       try{
         let r = await UI.store.fetcher.webOperation('GET',element.dataset.source);
@@ -421,6 +449,7 @@ export class UIX {
 }
 
   const uixType = {
+    rss: "action",
     include: "action",
     togglevisibility: "action",
     dropdown: "action",
