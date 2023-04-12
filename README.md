@@ -4,7 +4,7 @@
 
 The Solid UIX framework supports low and no-code building of Solid apps and websites by embedding simple tags in HTML.  Sites and apps built with Solid UIX are easy to make language independent and support a symbiotic division of labor between those who manage data and those who present it to the public.
 
-Please see this demo, a [complete reimagining of the SolidOS frontend](https://jeff-zucker.github.io/solid-uix/index.html) for an example app built entirely with Solid UIX.
+Please see this demo, a [complete reimagining of the SolidOS frontend](https://solidos.github.io/solid-uix/index.html) for an example app built entirely with Solid UIX.
 
 ## Basic Usage
 
