@@ -1,5 +1,5 @@
 async function runPlugin (UI,uix){
-  var data = 'http://localhost:3101/public/s/solid-uix/assets/ontologyBrowser.ttl';
+  var data = 'https://jeff-zucker.github.io/solid-uix/plugins/ontologyBrowser.ttl';
   let page = document.createElement('DIV');
   let menu = document.createElement('UL');
   let display = document.createElement('DIV');
