@@ -1,4 +1,4 @@
-import {ProfileSession} from '../src/profile.js';
+import {ProfileSession} from '../src/profile-extractor.js';
 const profiles = new ProfileSession({nowarnings:true});
 const webid = 'https://jeff-zucker.solidcommunity.net/profile/card#me';
 

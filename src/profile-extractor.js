@@ -39,7 +39,6 @@ export class Profile {
     const originalWebid = webid;
     await util.initLibraries();
     if(options && options.includeSeeAlsos) this.includeSeeAlsos=true;
-console.log(this.includeSeeAlsos)
     try { this.webid = util.sym(webid); }
     catch(e){
       try { 

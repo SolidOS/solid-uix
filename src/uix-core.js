@@ -1,7 +1,6 @@
 import * as util from '../src/utils.js';
-import {rdfEasy} from "./rdf-easy.js";
 import {show} from "./display.js";
-import {ProfileSession} from "./profile.js";
+import {ProfileSession} from "./profile-extractor.js";
 import {initLogin} from "./login.js";
 import {fetchAndParse} from "./rss.js";
 import {processPlugin,processStandAlonePlugin} from "./plugins.js";

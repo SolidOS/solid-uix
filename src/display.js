@@ -45,7 +45,7 @@ async function _showSolidOSLink(subject,element,self){
   subject = subject.uri ?subject :util.sym(subject);
   const params = new URLSearchParams(location.search)        
   params.set('uri', subject.uri);                                    
-  let base = "http://localhost:3101/public/s/solid-uix/"
+  let base = util.currentContainer() + "index.html";
   const o = panes.getOutliner(opt.dom || document);
   await self.refreshPodOwner(subject.uri,element);
   let currentPage = document.body.querySelector("[data-uix=currentPage]");

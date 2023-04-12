@@ -24,15 +24,6 @@ For HTML elements that accept multiple values (e.g. a list or a select), multipl
 <ul data-uix="podOwnerStorages"></ul>
 <select data-uix="podOwnerStorages"></select>
 ```
-
-### Multiple values in single-value elements
-
-If a variable returns multiple values and the varible is in a single-value context (e.g. a heading rather than a list), the default is to display the first value.  However, if you add the *data-format* attribute, the list of items will be shown as a comma-separated string :
-
-```html
-<b data-uix="podOwnerStorages" data-format="string"></b>
-```
-
 ### Referencing sources
 
 UIX variables can reference the owner of the pod being visited, the logged-in user, or any user defined in the HTML.  For example :
@@ -48,6 +39,33 @@ UIX variables can reference the owner of the pod being visited, the logged-in us
    ></b>
 ```
 
+## Supported Variables
+
+The following variables may be used with with either "user" or "podOwner" prepended.  For example "Name can be used as either podOwnerName or userName:
+
+Single-value : name, pronouns, photo, inbox, webid
+
+Multiple-value : roles, issuers, storages, instances, communities, friends
+
+These variables only apply to logged-in users:
+
+    editProfile, editPreferences
+
+These variables do not require a user-specifier :
+
+    solidLogo, solidLogin
+
+For predicates not covered by one of the variables, you can use either full URIs or, for vocabularies known to [solid-namespace](https://github.com/solid/solid-namespace), curies. These all show the same thing:
+
+```html
+  <div data-source="http://example.com/profile/card#me">
+    <h1 uix="podOwnerInbox"></h1>
+    <h1 uix="ldp:inbox"></h1>
+    <h1 uix="http://www.w3.org/ns/solid/terms#storage"></h1>
+  </div>
+```
+Note the usage above - we can specify the source of the profile once and it applies to all uix elements that are its children.  Also note that since we have specified a source, "podOwner", in this context, means the owner of the pod specified in the source, not of the pod we are visiting.
+
 ## Queries
 
 More docs coming soon, here's the TL;DR ...
@@ -58,7 +76,6 @@ This runs a store.each using the specified values
 <select id="myTopicSelector"
        data-uiq = "* a bk:Topic"
     data-source = "/public/s/solid-uix/news.ttl"
-
 ></select>
 ```
 
@@ -72,7 +89,6 @@ This takes the value of the previously shown select and uses it as a parameter i
 ></select>
 ```
 
-
 ## Actions
 
 More docs coming soon, here's the TL;DR ...
@@ -80,31 +96,8 @@ More docs coming soon, here's the TL;DR ...
 * buttons can automatically submit the value of the closest select
 * selects can fire actions in other components
 
+## Coming soon ...
 
-
-## Supported Variables
-
-The following variables may be used with with either "user" or "podOwner" prepended.  For example "Name can be used as either podOwnerName or userName:
-
-Single-value : name, pronouns, photo, inbox, webid, home
-
-Multiple-value : roles, issuers, storages, instances, communities, friends
-
-These variables only apply to logged-in users:
-
-    editProfile, editPreferences
-
-These variables do not require a user-specifier :
-
-    solidLogo, solidLogin, 
-
-UIX variables can take parameters.  For example if you want to know the name of a pod different from the one you're visiting, you can do this:
-
-```html
-<b data-uiv="podOwnerStorages"
-   data-source="https://solidos.solidcommunity.net/profile/card#me"
-></b>
-
-```
+Nested components, SPARQL queries, custom templates.
 
 &copy; Jeff Zucker, 2023 all rights reserved; May be freely distributed under an MIT license.

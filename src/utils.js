@@ -15,6 +15,11 @@ load, each, any, match, sym, literal, curie
 localWebid
 showIframesSrcDoc
 */
+export function currentContainer(){
+  let c = window.location.href;
+  if(c.endsWith('/')) return c;
+  else return c.replace(/\/[^\/]*$/,'/')
+}
 export async function localWebid(){
   if(window.SolidAppContext.webId) return window.SolidAppContext.webId;
   let local = window.origin + "/profile/card#me";
