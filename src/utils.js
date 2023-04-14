@@ -125,6 +125,14 @@ export function getNodeFromFieldValue(fieldSelector,key){
    catch(e){ console.log(e) }
 }
 
+export function getSiblingInput(element){
+    let p = element.parentNode;
+    let i = p.querySelector('SELECT') || p.querySelector('INPUT');
+    subject = i.value;                             
+    return subject;
+  }
+
+
 /*
   if we already loaded solid-ui or mashlib, use the UI object
   else, dynamically load rdflib, and solid-namespace
@@ -146,3 +154,40 @@ export async function ensureLibraries($rdf){
     return({ rdf:$rdf, ns, store });
   }
 }
+
+
+export  const uixType = {
+    createResource: "action",
+    rss: "action",
+    include: "action",
+    togglevisibility: "action",
+    dropdown: "action",
+    editprofile: "action",
+    editpreferences: "action",
+    quicknotes: "action",
+    go: "action",
+    accordion: "action",
+    query : "query",
+  }
+
+
+export    const solidVar = {
+      logo: ()=>{
+        return "https://solidproject.org/assets/img/solid-emblem.svg";
+      },
+      login: ()=>{
+       return "";
+      },
+      osbrowser: ()=>{
+        return `
+          <header id="PageHeader"></header>
+          <div id="right-column-tabulator">
+            <div class="TabulatorOutline" role="main" id="suicTabulator">
+              <table id="outline"></table>
+              <div id="GlobalDashboard"></div>
+            </div>
+          </div>
+          <footer id="PageFooter"></footer>
+        `;
+      },
+    }

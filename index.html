@@ -83,13 +83,13 @@
 
 <!-- just imported libraries below here, nothing to see -->
 
-<script src="https://solidos.github.io/mashlib/dist/mashlib.js" type="module">
+<script src="https://solidos.github.io/mashlib/dist/mashlib.min.js" type="module">
 </script>
 <script type="module"> 
-    import {UIX} from './src/uix-core.js';
+    import {SolidOSFrontEnd} from './src/solidOS.js';
     var uix;
     document.addEventListener('DOMContentLoaded', ()=>{
-        uix = new UIX();
+        uix = new SolidOSFrontEnd();
         uix.init();
     });
 </script>
