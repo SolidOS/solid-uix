@@ -1,3 +1,4 @@
+import * as util from "./utils.js";
 import {fetchAndParse} from "./rss.js";
 
 export  async function processAction(element){
@@ -116,9 +117,21 @@ export  async function processAction(element){
         this.show(subject,{dataset:{linktype:"SolidOS",uix:'userEditProfile',pane}});
       });
     }
+    if(action==="form"){
+      return await processForm(element,this);
+    }
     if(action==="createResource"){
       let fn = util.getSiblingInput(element)
 //      let success = util
     }
   }
 
+async function processForm(element,self){
+  let form = util.getIRInode(element.dataset.form);
+  let subjectString = element.dataset.subject;
+  let subjectVal = (util.getNodeFromFieldValue(subjectString)||{}).value ;  
+  let subject = util.getIRInode( subjectVal );  
+  if(!form || !subject) return;
+  const formElement = await self.showForm({form,subject});
+  if(formElement) element.appendChild(formElement);
+}

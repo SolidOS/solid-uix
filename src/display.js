@@ -42,6 +42,7 @@ async function _gitApiFetch(uri){
   //  return atob(json.content);
 }     
 
+
 /**
     @param {IRI} form - required: form location
     @param {IRI} subject - required: data location
@@ -74,6 +75,7 @@ export async function showForm(o){
     }  
     return container;
   }
+
 
 // WE HAVE THE DATA, SHOW IT
 //
