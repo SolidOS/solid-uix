@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+</head><body><main>
+
+<nav>
+<b>Solid UIX</b>
+  <a href="demo-home.md">home</a> 
+  <span>keywords</span> 
+  <a href="basic-queries.html">basic queries</a>
+  <a href="advanced-queries.html">advanced queries</a>
+  <a href="playground.html">playground</a>
+</nav>
+<hr>
+
+<div class="note">contents of a container</div>
+<pre>&lt;ul data-uix="<b>containerContents</b>"
+    data-from="https://solidos.solidcommunity.net/public/"
+>&lt;/ul></pre>
+<ul data-uix="containerContents"
+    data-from="https://solidos.solidcommunity.net/public/"
+></ul>
+<hr>
+
+<div class="note">information about  a profile owner</div>
+<pre>&lt;div data-from="https://timbl.solidcommunity.net/profile/card#me">
+    &lt;b data-uix="<b>profileOwnerName</b>">&lt;/b>
+    &lt;div data-uix="<b>profileOwnerPronouns</b>">&lt;/div>
+    &lt;ul data-uix="<b>profileOwnerCommunities</b>">&lt;/ul>
+&lt;/div></pre>
+<div data-from="https://timbl.solidcommunity.net/profile/card#me">
+  <b data-uix="profileOwnerName"></b>
+  <div data-uix="profileOwnerPronouns"></div>
+  <ul data-uix="profileOwnerCommunities"></ul>
+</div>
+<hr>
+
+<div class="note">instances of a specified class</div>
+<pre>&lt;select data-uix="profileOwnerInstances"
+    data-from="https://solidos.solidcommunity.net/profile/card#me"
+    <b>data-forClass="Tracker"</b>
+>&lt;/select></pre>
+<select data-uix="profileOwnerInstances"
+    data-from="https://solidos.solidcommunity.net/profile/card#me"
+    data-forClass="Tracker"
+></select>
+<hr>
+<!--
+<div class="note">chained elements</div>
+<pre>&lt;select data-uix="profileOwnerInstances"
+    data-from="https://solidos.solidcommunity.net/profile/card#me"
+    data-forClass="Tracker"
+>&lt;/select></pre>
+<select id="#communities" data-uix="profileOwnerCommunities"
+    data-from="https://timbl.solidcommunity.net/profile/card#me"
+    data-target="#tools"
+></select>
+<ul id="#tools" data-uix="profileOwnerInstances"
+    data-from="#communities"
+></ul>
+
+<hr>
+-->
+
+<div class="note">conditional display<br>based on login-status</div>
+<pre>&lt;div data-uix="<b>ifLoggedIn</b>" class="hidden">
+  You &lt;b>are&lt;/b> logged in!
+  Your webid is &lt;b data-uix="userWebid">&lt;/b>.
+&lt;/div>
+&lt;div data-uix="<b>ifNotLoggedIn</b>" class="hidden">
+  You are &lt;b>not&lt;/b> logged in!
+&lt;/div></pre>
+<div data-uix="ifLoggedIn" class="hidden">
+  You <b>are</b> logged in!
+  Your webid is <b data-uix="userWebid"></b>.
+</div>
+<div data-uix="ifNotLoggedIn" class="hidden">
+  You are <b>not</b> logged in!
+</div>
+<hr>
+
+
+</main><!-- only imports below here, nothing specific to this app
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+-->
+<link rel="stylesheet" href="./demo.css" />
+<script src="../../solidos/workspaces/mashlib/dist/mashlib.js" type="module">
+</script>
+<script type="module"> 
+    import {UIX} from '../src/uix-core.js';
+    var uix;
+    document.addEventListener('DOMContentLoaded', async ()=>{
+        uix = new UIX();
+        await uix.init();
+    });
+</script></body></html>
+

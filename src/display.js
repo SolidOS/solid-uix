@@ -1,16 +1,56 @@
 import * as util from './utils.js';
 
 /*
-  linktypes
+  show linktypes
     HTML     (interpolates uix-values, then shows it)
     SolidOS  (shows using SolidOS databrowser)
     Text     (shows inside <code> tags)
     Markdown (shows as HTML)
+  showForm
+  showProperties
+  showInElement
 */
+
+export async function showProperties(element){
+  element.innerHTML="";
+  let subjectNode = util.getSource(element);
+  let wanted = element.dataset.select ?element.dataset.select.toLowerCase() :"";
+  let isWanted = {};
+  for(let w of wanted.split(/ /)){ isWanted[w]=true;}
+  await util.load( subjectNode.doc() );
+  let table = document.createElement('DIV');
+  table.style.display="table";
+  let counter = 0;
+  let lastFound = "";
+  for(let property of util.match(subjectNode)){
+    let unmungedPredicate = property.predicate.value.replace(/.*\//,'').replace(/.*\#/,'').toLowerCase();
+    if(wanted && !isWanted[unmungedPredicate]) continue;
+    let row = document.createElement('DIV');
+    row.style.display="table-row";
+    let th = document.createElement('B');
+    th.style.display="table-cell";
+    let td = document.createElement('DIV');
+    td.style.display="table-cell";
+    th.style["padding-right"]="1rem";
+    th.style['text-align']="right";
+    th.innerText = util.bestLabel(property.predicate);
+    td.innerText = lastFound = util.bestLabel(property.object);
+    row.appendChild(th);         
+    row.appendChild(td);         
+    table.appendChild(row);       
+    counter++
+  }
+  if(counter>1) element.appendChild(table);
+  else element.innerText = lastFound;
+}
+
 export async function show(uri,element){
   let linktype = element.dataset.linktype
-  let needsproxy = element.dataset.needsproxy;
+  let needsproxy = element.dataset.needsproxy || linktype==='rss';
   if(needsproxy) uri = this.proxy+uri;
+  if(!linktype){
+    if(element.dataset.uix.toLowerCase().match(/^(user|profileowner|edit)/)) linktype='SolidOS'
+  }
   if(linktype==="SolidOS") return this.showSolidOSLink(uri,element,this);
   let content;
   try {
@@ -58,14 +98,14 @@ export async function showForm(o){
     let form = UI.rdf.sym(o.form);
     let doc = o.formResultDocument;
     let formFromString = o.formString;
-    let subject = o.formSubject;
+    let subject = o.subject;
     let script = o.script || function(){};
     try {
       subject = UI.rdf.sym(subject) ;
       if(o.formString){
         UI.rdf.parse(o.formString,UI.store,o.form,'text/turtle');
       }
-      else await UI.store.fetcher.load(o.form);
+      else await UI.store.fetcher.load(form);
       await UI.store.fetcher.load(subject.doc());
       await UI.widgets.appendForm(dom, container, {}, subject, form, doc, script);
     }
@@ -76,32 +116,103 @@ export async function showForm(o){
     return container;
   }
 
+function aoh2table(table,aoh){
+  let fields = Object.keys(aoh[0]);
+  let counter = 0;
+  let lastFound = "";
+  let toprow = document.createElement('TR');
+  for(let field of fields){
+    let th = document.createElement('TH');
+    th.style.display="table-cell";
+    th.innerText = field;
+    th.style.background="#c0c0c0";
+    th.style.border="1px solid black";
+    toprow.appendChild(th);    
+  }
+  table.appendChild(toprow);
+  for(let r of aoh){
+    let row = document.createElement('TR');
+    row.style.display="table-row";
+    for(let field of fields){
+      let td = document.createElement('TD');
+      td.style.display="table-cell";
+      td.style.border="1px solid black";
+      td.innerText = lastFound = row[field] = r[field];
+      row.appendChild(td);         
+    }
+    table.appendChild(row);       
+    counter++
+  }
+  table.style["border-collapse"]="collapse";
+  if(counter>1) return table;
+  else return lastFound;
+}
+const isBuiltInTemplate = {
+  "tabset":1,
+}
+//import {tabset} from './templates/tabset.js';
+function showBuiltInTemplate(template,element,results,self){
+  template=template.toLowerCase();
+  switch(template){
+    case "tabset" :
+      self.tabset(element,results);
+      break;  
+  }
+}
+
+function showTemplate(element,results,self){
+  let template = element.dataset.template;
+  if(!template) return results;
+  if(isBuiltInTemplate[template.toLowerCase()]){
+     showBuiltInTemplate(template,element,results,self);
+     return;
+  }
+  for(let row of results){
+     element.innerHTML += element.dataset.template.interpolate(row);
+  }
+}
+
+const multiValueTag = { ul:1, dl:1, select:1, table:1 }
 
 // WE HAVE THE DATA, SHOW IT
 //
-export async function showInElement(actionElement,output){
+export async function showInElement(element,output){
     const self = this;
-    let actionVerb=((actionElement.dataset.uix)||"").toLowerCase();
-    if(actionVerb.match(/home/)) actionElement.dataset.pane="folder";
-    switch(actionElement.tagName) {
+//    element.innerHTML="";
+    if(element.dataset.template) return showTemplate(element,output,self);
+    let actionVerb=((element.dataset.uix)||"").toLowerCase();
+    if(actionVerb.match(/home/)) element.dataset.pane="folder";
+    if(!multiValueTag[element.tagName.toLowerCase()] && typeof output != "string"){
+      if(output.length) output = output[0];
+      if(!output.length){
+        let label="";
+        for(let k of Object.keys(output)){
+          if(!k.match(/(link|label)/)) output.label = util.bestLabel(output[k]);
+        }
+      }
+    }
+    switch(element.tagName) {
+      case 'TABLE':
+          aoh2table(element,output);
+          break;
       case 'IMG':
-          actionElement.src = output;
+          element.src = output;
           break;
       case 'INPUT' :
-          actionElement.appendChild(output);
+          element.appendChild(output);
           break;
       case 'BUTTON' :
           if(output && typeof output !="string"){
             output = output[0] ? output[0].link :output.link || output;
           }
-          actionElement.href = output;
-          actionElement.addEventListener('click',async(e)=> {
+          element.href = output;
+          element.addEventListener('click',async(e)=> {
             e.preventDefault();
             let subject = e.target.href;
-            actionElement.dataset.linktype="SolidOS";
-            this.show(subject,actionElement);
+            element.dataset.linktype="SolidOS";
+            this.show(subject,element);
           });
-          // setStyle(actionElement,'buttonStyle');  // for example
+          // setStyle(element,'buttonStyle');  // for example
           break;
       case 'A' :
           if(output && typeof output !="string"){
@@ -109,33 +220,41 @@ export async function showInElement(actionElement,output){
           }
           // Don't show links to non-existant resources
           if(!output || !output.length) { 
-            actionElement.style.display="none";
+            element.style.display="none";
           }
           else {
-            actionElement.style.display="inline-block";
-            actionElement.href = output;
-            actionElement.addEventListener('click',async(e)=> {
+            element.style.display="inline-block";
+            element.href = output;
+            element.addEventListener('click',async(e)=> {
               e.preventDefault();
-              actionElement.dataset.linktype="SolidOS";
-              this.show(e.target.href,actionElement);
+              element.dataset.linktype="SolidOS";
+              this.show(e.target.href,element);
             });
           }
           break;
       case 'DL' :
-            let loop = actionElement.dataset.loop;
+            let loop = element.dataset.loop;
             for(let row of output){
               let dt = document.createElement('DT');
               dt.innerHTML = row.label || row;
               dt.dataset.uix=loop;
-              actionElement.appendChild(dt);
+              element.appendChild(dt);
             }
             console.log(output); //outer = await <dl data-uix="userCommunities"
           break;
       case 'SELECT' :
-          if(actionElement.options){
-            while( actionElement.options.length > 0) {
-              actionElement.remove(0);
+          if(element.options){
+            while( element.options.length > 0) {
+              element.remove(0);
             }
+          }
+          if(element.dataset.prompt){
+            let prompt = document.createElement('OPTION');
+            prompt.selected = true;
+            prompt.disabled = true;
+            prompt.value="";
+            prompt.innerHTML=element.dataset.prompt;
+            element.appendChild(prompt);
           }
           for(let row of output){
             let opt = document.createElement('OPTION');
@@ -147,17 +266,22 @@ export async function showInElement(actionElement,output){
               opt.value = row;
               opt.innerHTML = _bestLabel(row);
             }
-            actionElement.appendChild(opt);
+            element.appendChild(opt);
           }
-          if(actionElement.dataset.target){
-            actionElement.addEventListener('change',()=>{
-              let  el = actionElement.dataset.target.replace(/^#/,'');
-              self.process( document.getElementById(el) );
+          if(element.dataset.target){
+            element.addEventListener('change',()=>{
+              let  el = element.dataset.target.replace(/^#/,'');
+              let i = element.selectedIndex;
+              if(!i || i<0) element.selectedIndex=0;
+              el = document.getElementById(el);
+              el.innerHTML="";              
+              self.process( el );
             });
           }
+
           break;
       case 'UL' :
-          actionElement.innerHTML="";
+          element.innerHTML="";
           for(let row of output){
             let li = document.createElement('LI');
             let anchor = document.createElement('A');
@@ -168,16 +292,20 @@ export async function showInElement(actionElement,output){
                anchor.href = row.link;
                anchor.innerHTML = row.label;
             }
-            anchor.addEventListener('click',(e)=>{
-              e.preventDefault();
-              actionElement.dataset.linktype="SolidOS";
-              this.show(e.target.href,actionElement);
-            });
+            if(!element.dataset.uix.match(/rss/i)){
+              anchor.addEventListener('click',(e)=>{
+                e.preventDefault();
+                this.show(e.target.href,element);
+              });
+            }
             li.appendChild(anchor);
-            actionElement.appendChild(li);
+            element.appendChild(li);
           }
           break;
-      default : actionElement.innerHTML = output;
+      default : {
+          if(typeof output !="string") output = output.label || output.link || ""
+          element.innerHTML = output;
+      }
 
     } // end of tag-type swich statement
 

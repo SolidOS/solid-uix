@@ -1,4 +1,4 @@
-import * as util from '../src/utils.js';
+import * as util from './utils.js';
 
 export class ProfileSession {
 
@@ -100,7 +100,7 @@ async getWithNames(requestString,element){
       results.push(row);
     }
   }
-  else if(requestString==='friends') predicate = predicate = 'foaf:knows';
+  else if(requestString==='friends') predicate = 'foaf:knows';
   else if(requestString==='communities') predicate = 'solid:community';
   if(predicate){
     for(let c of this.getall(predicate)){
@@ -159,13 +159,12 @@ function getShortcut(self,req,element){
     let instances = util.match(null,util.curie('solid:forClass'),null,pti);
     for(let i of instances){
       let classObj = i.object;
-      let where = (element && element.dataset) ?(util.str2node(element.dataset.where)||{}).value :null;
-      if(!where ||(where && where===classObj.value)){
+      let where = element.dataset.forclass;
+      if(!where || classObj.value.toLowerCase().match(where.toLowerCase())){
         let instance = util.any(i.subject,util.curie('solid:instance'),null,pti);
         if(!instance) continue;
         const row ={link:instance.value,forClass:classObj.value};
-//        const label = util.bestLabel(classObj,store,ns);
-let label;
+        const label = util.bestLabel(classObj);
         if(label) row.label = label;
         instanceArray.push(row);
       }

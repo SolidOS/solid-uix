@@ -6,30 +6,30 @@
 
 <div class="banner">
     <span><img data-uix="solidLogo" /></span>
-    <div class="podOwnerPanel">       
-        <div class="podOwnerDescription">
-            <h2 data-uix="podOwnerName"></h2>
-            <div data-uix="podOwnerRole"></div>
-            <div data-uix="podOwnerPronouns"></div>
+    <div class="profileOwnerPanel">       
+        <div class="profileOwnerDescription">
+            <h2 data-uix="profileOwnerName"></h2>
+            <div data-uix="profileOwnerRole"></div>
+            <div data-uix="profileOwnerPronouns"></div>
         </div>
     </div>
-    <img data-uix="podOwnerPhoto" />
+    <img data-uix="profileOwnerPhoto" />
 </div>
 
 <div class="topMenu">
     <span id="userMenuToggle">&equiv;</span>
     <div data-uix="solidLogin"></div>
-    <div class="podOwnerMenu">
-        <a data-uix="podOwnerHome">Home</a> 
-        <a href="" data-uix="podOwnerWebid">Profile</a>
-        <a data-uix="podOwnerInstances"
-           data-where="vcard:AddressBook"
+    <div class="profileOwnerMenu">
+        <a data-uix="profileOwnerHome">Home</a> 
+        <a href="" data-uix="profileOwnerWebid">Profile</a>
+        <a data-uix="profileOwnerInstances"
+           data-forClass="AddressBook"
         >Address Book</a>
-        <a data-uix="podOwnerInstances"
-           data-where="<http://www.w3.org/2005/01/wf/flow#Tracker>"
+        <a data-uix="profileOwnerInstances"
+           data-forClass="Tracker"
         >Roadmap</a>
-        <a data-uix="podOwnerInstances"
-           data-where="<http://www.w3.org/ns/pim/meeting#LongChat>"
+        <a data-uix="profileOwnerInstances"
+           data-forClass="LongChat"
         >Chat with me!</a>
     </div>
     <span id="helpMenu">

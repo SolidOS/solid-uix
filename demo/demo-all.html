@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+</head><body><main>
+
+<table>
+
+  <tr>
+  <td> contents of a container</td>
+<td><pre>&lt;ul data-uix="<b>containerContents</b>"
+    data-source="https://solidos.solidcommunity.net/public/"
+>&lt/ul></pre></td>
+  <td>
+     <ul data-uix="containerContents" data-source="https://solidos.solidcommunity.net/public/"></ul>
+  </td></tr>
+
+  <tr>
+  <td>information about a profile owner</td>
+<td><pre>&lt;div data-source="https://timbl.solidcommunity.net/profile/card#me">
+    &lt;b data-uix="<b>profileOwnerName</b>">&lt;/b>
+    &lt;p data-uix="<b>profileOwnerPronouns</b>">&lt;/p>
+    &lt;ul data-uix="<b>profileOwnerCommunities</b>">&lt;/ul>
+&lt;/div></pre></td>
+  <td>
+     <div data-source="https://timbl.solidcommunity.net/profile/card#me">
+        <b data-uix="profileOwnerName"></b>
+        <p data-uix="profileOwnerPronouns"></p>
+        <ul data-uix="profileOwnerCommunities"></ul>
+     </div>
+  </td></tr>
+
+<!--
+  <tr>
+  <td>single-field / multi-record queries</td>
+<td><pre>&lttable data-uix="<b>query</b>"
+    data-select="name"
+    data-from="test-data.ttl"
+>&lt;/table></pre></td>
+  <td>
+<ul data-uix="query"
+    data-select="name"
+    data-from="test-data.ttl"
+></ul>
+  </td></tr>
+-->
+  <tr>
+  <td>multi-field / multi-record queries</td>
+<td><pre>&lttable data-uix="<b>query</b>"
+    data-select="name age"
+    data-from="test-data.ttl"
+    data-where="type Person"
+>&lt;/table></pre></td>
+  <td>
+<table data-uix="query"
+    data-select="name age"
+    data-from="test-data.ttl"
+    data-where="type Person"
+></table>
+  </td></tr>
+
+  <tr>
+  <td>single field / single record query</td>
+<td><pre>&lt;div data-uix="<b>query</b>"
+    data-select="title"
+    data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"
+>&lt/div></pre></td>
+  <td>
+     <span data-uix="query" 
+           data-select="title"
+           data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"
+     ></span>
+  </td></tr>
+
+  <tr>
+  <td>muli-field / single record query</td>
+<td><pre>&lt;div data-uix="<b>query</b>"
+    data-select="type author title"
+    data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"
+>&lt/div></pre></td>
+  <td>
+     <span data-uix="query" 
+          data-select="type author title"
+          data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"
+     ></span>
+  </td></tr>
+
+  <tr>
+  <td>a form</td>
+  <td><pre>&lt;div data-uix="<b>form</b>"
+    data-form="test.ttl#Form"
+    data-subject="test.ttl#Data"
+>&lt;/div></pre></td>
+  <td>
+    <div data-uix="form"
+         data-form="test.ttl#Form"
+         data-subject="test.ttl#Data"
+    ></div>
+  </td></tr>
+
+  <tr>
+  <td>private information about yourself but only when logged-in</td>
+  <td><pre>&lt;div data-uix="<b>ifLoggedIn</b>">
+    &lt;ul data-uix="<b>userInstances</b>">&lt/ul>
+&lt;/div>
+&lt;div data-uix="<b>ifNotLoggedIn</b>">
+    You need to be logged in to see this.
+    We could popup a login button here too.
+&lt;/div></pre></td>
+  <td>
+    <div data-uix="ifLoggedIn">
+        <ul data-uix="userInstances"></ul>
+    </div>
+    <div data-uix="ifNotLoggedIn">
+     You need to be logged in to see this.
+     We could popup a login button here too.
+    </div>
+  </td></tr>
+
+  <tr>
+  <td>all fields / single record query</td>
+<td><pre>&lt;div data-uix="<b>query</b>"
+    data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"
+>&lt/div></pre></td>
+  <td>
+     <div data-uix="query" data-from="https://solidos.solidcommunity.net/public/Roadmap/Tasks/index.ttl#this"></div>
+  </td></tr>
+
+<!--
+  <tr>
+  <td>login/logout button</td>
+  <td><pre>&lt;button data-uix="<b>solidLogin</b>">&lt;/button>
+  </pre></td>
+  <td>
+    <span data-uix="solidLogin"></span>
+  </td></tr>
+
+  <tr>
+  <td>a visibility toggler</td>
+  <td><pre>&lt;button data-uix="<b>toggleVisibility</b>">  click me! &lt;/button>
+&lt;div class="hidden"> show me or hide me! &lt;/div></pre></td>
+  <td>
+    <button data-uix="toggleVisibility">  click me! </button>
+    <div class="hidden"> show me or hide me! </div>
+  </td></tr>
+-->
+
+
+</table>
+
+<style>
+tr,td {
+  vertical-align:top;
+  border:1px solid grey;
+  padding:1em;
+}
+.hidden { display:none; }
+td table { float:left; margin-right:2rem; }
+</style>
+<!--
+<label>Stuff
+<select>
+    <option value="" disabled selected>Select your option</option>
+    <option value="hurr">Durr</option>
+</select> 
+</label>
+   
+<div data-uix="form" data-source="task1.ttl#this">
+  <input data-property="task-name" data-fieldtype="SingleLineTextField" />
+  <input type=data-property="completed" data-fieldtype="Boolean"/>
+</div>
+-->
+
+</main><!-- only imports below here, nothing specific to this app
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+-->
+<script src="../../solidos/workspaces/mashlib/dist/mashlib.js" type="module">
+</script>
+<script type="module"> 
+    import {UIX} from '../src/uix-core.js';
+    var uix;
+    document.addEventListener('DOMContentLoaded', async ()=>{
+        uix = new UIX();
+        await uix.init();
+    });
+</script></body></html>
+

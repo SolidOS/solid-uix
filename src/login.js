@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
           initLogin('login');
         });
         authSession.onLogout( ()=>{
-          if(this) this.podOwner=null;
+          if(this) this.profileOwner=null;
           initLogin('logout');
         });
         authSession.onSessionRestore( ()=>{
@@ -59,7 +59,7 @@ export async function initLogin(loginType){
         button.value = outLabel || "Log out!";           
         button.title= "--- logged in as " + me.value + "\n--- click to logout";
         button.style.color="green";
-        if(self) self.podOwner = me.value;
+        if(self) self.profileOwner = me.value;
         if(note) note.style.display="none";
     }
     else {

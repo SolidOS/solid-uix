@@ -115,7 +115,7 @@ overflow:auto;
   height:110px;
   width:110px;
 }
-.podOwnerDescription {
+.profileOwnerDescription {
   text-align:center;
   margin-right:1rem;
 }
@@ -158,7 +158,7 @@ img[data-uix="solidLogo"] {
   margin:0;
 }
 div[data-uix="solidLogin"] input,
-.podOwnerMenu a, .podOwnerMenu button, #userPanel a, #userPanel button  {
+.profileOwnerMenu a, .profileOwnerMenu button, #userPanel a, #userPanel button  {
   border-radius:0.2rem;
   border:none;
   padding:0.4rem;
@@ -172,7 +172,7 @@ div[data-uix="solidLogin"] input,
 }
 
 div[data-uix="solidLogin"] input:hover,
-.podOwnerMenu a:hover, .podOwnerMenu button:hover,
+.profileOwnerMenu a:hover, .profileOwnerMenu button:hover,
 .topMenu a:hover,
 .banner a:hover, .banner button:hover,
 #userPanel a:hover, #userPanel button:hover {

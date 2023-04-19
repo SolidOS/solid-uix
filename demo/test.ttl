@@ -1,0 +1,8 @@
+@prefix : <#>.
+@prefix ui: <http://www.w3.org/ns/ui#>.
+
+:Data a :Person; :name "Waldo"; :happy true.
+
+:Form a ui:Form; ui:parts( :Field1 :Field2).
+:Field1 a ui:SingleLineTextField; ui:property :name.
+:Field2 a ui:BooleanField; ui:property :happy.

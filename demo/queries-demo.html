@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+</head><body><main>
+<ul data-uix="breadcrumbs">
+  <li>solid-uix</li>
+  <li>queries</li>
+  <li>basic-examples</li>
+</ul>
+<hr>
+Solid UIX
+  <a href="demo.html">home</a> 
+| <a href="keywords.html">keywords</a> 
+| <a href="basic-queries.html">basic queries</> 
+| <a href="advanced-queries.html">advanced queries</a>
+<hr>
+
+
+<div class="note">query for a table</div>
+<pre>&lt;table data-uix="query"
+    data-select="name age email"
+    data-from="test-data.ttl"
+    data-where="type Person"
+>&lt;/table></pre><table data-uix="query"
+    data-select="name age email"
+    data-from="test-data.ttl"
+    data-where="type Person"
+></table>
+<hr>
+
+<div class="note">query for a record</div>
+<pre>&lt;div data-uix="query"
+    data-from="test-data.ttl#Thing1"
+>&lt;/div></pre><div data-uix="query"
+    data-from="test-data.ttl#Thing1"
+></div>
+<hr>
+
+<div class="note">query for a value</div>
+<pre>&ltb data-uix="query"
+    data-select="type"
+    data-from="test-data.ttl"
+    data-where="name Fido"
+>&lt;/b></pre><div><b data-uix="query"
+    data-select="type"
+    data-from="test-data.ttl"
+    data-where="name Fido"
+></b></div>
+<hr>
+
+<br><div class="note"> fill templates from queries</div>
+<pre>&ltdiv data-uix="query"
+    data-select="name age"
+    data-from="test-data.ttl"
+    data-template=
+     "&lt;p>${name} is ${age} years old.&lt;/p>"
+>&lt/div></pre><div data-uix="query"
+    data-select="name age"
+    data-from="test-data.ttl"
+    data-template=
+      "<p>${name} is ${age} years old.</p>"
+></div>
+
+<br><div class="note">fill built-in interactive templates (tabs,accordions,etc.) from queries</div>
+<pre>&lt;div data-uix="query"
+    data-select="name"
+    data-distinct="name"
+    data-from="test-data.ttl"
+    data-template="Tabset"
+>&lt;div></pre>
+<div id="tabs"><div data-uix="query"
+    data-select="name"
+    data-distinct="name"
+    data-from="test-data.ttl"
+    data-template="Tabset"
+></div></div>
+<hr>
+
+<!--
+<br><div class="note">fill select elements with queries;<br>
+trigger record display from a record selector</div>
+<pre>&lt;select id="<b>recordSelector</b>" data-uix="query"
+    data-select="name"
+    data-from="test-data.ttl"
+    data-unique="name"
+    data-target="#recordDisplay"
+>&lt;/select>
+&lt;div id="recordDisplay" data-uix="query"
+    <b>data-from="#recordSelector"</b>
+>&lt;/div></pre>
+<select id="recordSelector" data-uix="query"
+    data-select="name"
+    data-from="test-data.ttl"
+    data-unique="name"
+    data-target="#recordDisplay"
+></select>
+<div id="recordDisplay" data-uix="query"
+    data-from="#recordSelector"
+></div>
+<hr>
+
+<br><div class="note">fill a parameter in one query<br>
+from the results of another query</div><pre>&lt;select data-uix="query" id="<b>topicSelector</b>"
+  data-select="label"
+  data-from="../plugins/news/news.ttl"
+  data-where="type Topic"
+  data-target="#sourceSelector"
+  data-prompt="select a news topic"
+>&lt;/select>
+&lt;select data-uix="query" id="sourceSelector"
+  data-select="recalls"
+  data-from="../plugins/news/news.ttl"
+  <b>data-where="topic ?"</b>
+  <b>data-paramfrom="#topicSelector"</b>
+  data-prompt="select a news source"
+>&lt;/select>
+</pre>
+<select data-uix="query" id="topicSelector"
+  data-select="label"
+  data-from="../plugins/news/news.ttl"
+  data-where="type Topic"
+  data-target="#sourceSelector"
+  data-prompt="select a news topic"
+></select>
+<select data-uix="query" id="sourceSelector"
+  data-select="recalls"
+  data-from="../plugins/news/news.ttl"
+  data-where="topic ?"
+  data-paramfrom="#topicSelector"
+  data-prompt="select a news source"
+></select>
+<hr>
+-->
+<!--
+<div data-uix="accordion"
+>
+-->
+
+
+<style>
+.note{
+ text-align:right;
+ width:19rem;
+ font-weight:bold;
+}
+p {
+  margin-top:0;
+}
+select {
+  padding:0.5rem;
+}
+pre, table,ul,select,#recordSelector, #recordDisplay, .note,#tabs {
+float:left;
+padding-left:1rem;
+padding-right:1rem;
+}
+pre {
+  width:22rem;
+  padding:0;
+  margin:0;
+}
+hr { clear:both; opacity:0; }
+table {
+margin-bottom:1rem;
+}
+tr,td {
+  vertical-align:top;
+  border:1px solid grey;
+  padding:1em;
+}
+.hidden { display:none; }
+td table { float:left; margin-right:2rem; }
+</style>
+<!--
+<label>Stuff
+<select>
+    <option value="" disabled selected>Select your option</option>
+    <option value="hurr">Durr</option>
+</select> 
+</label>
+   
+<div data-uix="form" data-source="task1.ttl#this">
+  <input data-property="task-name" data-fieldtype="SingleLineTextField" />
+  <input type=data-property="completed" data-fieldtype="Boolean"/>
+</div>
+-->
+
+</main><!-- only imports below here, nothing specific to this app
+<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+-->
+<script src="../../solidos/workspaces/mashlib/dist/mashlib.js" type="module">
+</script>
+<script type="module"> 
+    import {UIX} from '../src/uix-core.js';
+    var uix;
+    document.addEventListener('DOMContentLoaded', async ()=>{
+        uix = new UIX();
+        await uix.init();
+    });
+</script></body></html>
+

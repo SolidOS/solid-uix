@@ -2,7 +2,40 @@
 
 -- data-rich Solid components with little or no coding
 
-The Solid UIX framework supports low and no-code building of Solid apps and websites by embedding simple tags in HTML.  Sites and apps built with Solid UIX are easy to make language independent and support a symbiotic division of labor between those who manage data and those who present it to the public.
+The Solid UIX framework supports low and no-code building of Solid apps, websites, and pod-management tools by embedding simple attributes in HTML.  The framework has three levels, all of which use embedded HTML attributes and none of which require javascript coding.
+
+Basic usage requires only knowledge of HTML and CSS and of the two dozen or so keywords like "containerContents" and "profileOwnerFriends" which provide interactive access to pod data.  These keywords allow you to construct HTML pages that pull data from your own pod or from any pod you have access to.
+
+Intermediate usage adds a simple query language that allow you to specify the entities and  properties you want to display. For example, given an RDF document containing data about humans and pets you can display an HTML table of the humsans something like so:
+
+```html
+<table data-uix="query"
+    data-select="name age email"
+    data-from="myData.ttl"
+    data-where="type Person"
+></table>
+```
+
+<table  data-uix = "query"
+        data-endpoint = "DOCUMENT-OR-SUBJECT"
+        data-query = "SimplSPARQL-QUERY"
+        data-tempate = "DATA-TEMPLATE"
+></table>
+
+Data-Source
+  
+  
+
+Basic
+ * supports profiles, users, and pods (indexes,containers,inboxes,etc.)
+ * requires HTML + CSS + keywords
+
+Basic
+ * handles any data stored as RDF
+ * requires HTML + CSS + query
+
+<div class="note">query for a record</div>
+
 
 Please see this demo, a [complete reimagining of the SolidOS frontend](https://solidos.github.io/solid-uix/index.html) for an example app built entirely with Solid UIX.
 

@@ -2,7 +2,7 @@ import * as util from "./utils.js";
 import {fetchAndParse} from "./rss.js";
 
 export  async function processAction(element){
-    let action = element.dataset.uix;
+    let action = element.dataset.uix.toLowerCase();
     let user = typeof UI != "undefined" ?UI.authn.currentUser() :null;
     let eventType = element.tagName==='SELECT' ?'change' :'click';
     if(action==='rss'){
@@ -75,7 +75,7 @@ export  async function processAction(element){
         this.show(subject,element);
       });
     }
-    if(action==='toggleVisibility'){
+    if(action==='togglevisibility'){
       element.addEventListener('click',async(e)=> {
         e.preventDefault();
         let button = e.target;
@@ -105,20 +105,29 @@ export  async function processAction(element){
       if(!user) return;
       user = await this.profileSession.add(user);
       let subject,pane;
-      if(action==='editProfile'){
+      if(action==='editprofile'){
         subject = user.context.webid.value;
         pane = 'editProfile';
       }
-      else if(action==='editPreferences'){
+      else if(action==='editpreferences'){
         subject = user.context.preferencesFile.value;
         pane = 'basicPreferences';
       }
       element.addEventListener(eventType,()=> {
-        this.show(subject,{dataset:{linktype:"SolidOS",uix:'userEditProfile',pane}});
+        this.show(subject,{dataset:{linktype:"SolidOS",uix:'editProfile',pane}});
+      });
+    }
+    if(action==="processcomponent"){
+     let self = this;
+      element.addEventListener('click',async(event)=>{
+        return await processComponent(element,self);
       });
     }
     if(action==="form"){
       return await processForm(element,this);
+    }
+    if(action==="simpleform"){
+      return await fillSimpleForm(element,this);
     }
     if(action==="createResource"){
       let fn = util.getSiblingInput(element)
@@ -130,8 +139,67 @@ async function processForm(element,self){
   let form = util.getIRInode(element.dataset.form);
   let subjectString = element.dataset.subject;
   let subjectVal = (util.getNodeFromFieldValue(subjectString)||{}).value ;  
-  let subject = util.getIRInode( subjectVal );  
+  let subject = util.getIRInode( subjectString );  
   if(!form || !subject) return;
   const formElement = await self.showForm({form,subject});
   if(formElement) element.appendChild(formElement);
+}
+
+async function fillSimpleForm(element,self){
+  let node = util.getSource(element);
+  let subject = node ?node.value :null;
+  if(!subject) return;
+  await util.load(node.doc());
+  for(let field of element.querySelectorAll('INPUT')){
+    if(field.type.match(/text/i)){
+      let predicate = util.curie(field.dataset.fieldname);
+      field.value = (util.any(node,predicate)||{}).value || "";
+      field.dataset.originalvalue = field.value;
+    }
+    else if(field.type.match(/radio/i)){
+      let predicate = util.curie(field.name);
+      let wanted = util.any(node,predicate);
+      for(let i of document.querySelectorAll(`*[name="${field.name}"]`)){
+        if(util.curie(i.value).value===wanted.value) i.checked=true;
+      }
+    }
+  }
+  for(let field of element.querySelectorAll('TEXTAREA')){
+    let predicate = util.curie(field.dataset.fieldname);
+    field.innerHTML = (util.any(node,predicate)||{}).value || "";
+  }
+}
+async function processComponent(element){
+  let harvested = [];
+  let source = document.getElementById(element.dataset.source.replace(/^#/,''));
+  let target = document.getElementById(element.dataset.target.replace(/^#/,''));
+  for(let field of source.querySelectorAll('INPUT')){
+    if(field.type.match(/text/i)){
+      console.log(33,field)
+      if(field.value===field.dataset.originalvalue) continue;
+    }
+    else if(field.type.match(/radio/i)){
+      for(let i of document.querySelectorAll(`*[name="${field.name}"]`)){
+        if(i.checked) console.log(i.value);
+      }
+    }
+  }
+  for(let field of source.querySelectorAll('TEXTAREA')){
+//    let predicate = util.curie(field.dataset.fieldname);
+//    tarfield.innerHTML = (util.any(node,predicate)||{}).value || "";
+  }
+/*
+  for(let i of inputs){
+    let row = {};
+    let type = i.dataset.type;
+    row.subject =  url;
+    row.predicate = i.dataset.predicate;
+    row.object = i.value;
+    if(i.type==="textarea") row.object = i.innerHTML;
+    else if(i.type==="radio" && i.checked) {console.log(i);row.object = i.value;}
+    else if(i.type==="radio") continue;
+    harvested.push(row);
+  }
+  console.log(44,harvested)
+*/
 }

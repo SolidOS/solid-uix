@@ -141,22 +141,27 @@ export function getIRInode(url){
 /* DOM-walking methods
    -------------------
    getSource(element)              // returns data-source URL as string from element or its parent
-   getNodeFromFielValue(elementID) // returns node of the value of a named input/select element
+   getNodeFromFieldValue(elementID) // returns node of the value of a named input/select element
    getSiblingInput(element)        // returns string value of a sibling input/select element
 */
 export function getSource(element){
-  return getNodeFromFieldValue(element.dataset.source) || getNodeFromFieldValue(element.dataset.sourcefrom);
+  let source = element.dataset.from;
+  if(!source && element.parentNode && element.parentNode.dataset) source =element.parentNode.dataset.from;
+  if(!source) return;
+  if(source.startsWith('#')) return getNodeFromFieldValue(source);
+  else return getIRInode(source);
 }
-export function getNodeFromFieldValue(fieldSelector,key){
+export function getNodeFromFieldValue(fieldSelector){
    if(!fieldSelector) return;
    let paramField = document.getElementById( fieldSelector.replace(/^#/,'') );
    if(!paramField ) return;
-   let param = paramField[paramField.selectedIndex]; // SELECT
+   let index = paramField.selectedIndex;
+   if(typeof index==="undefined" || index<0) index=0;
+   let param = paramField[index]; // SELECT
    if(!param ) return;
    try { return sym(param.value); }
    catch(e){ console.log(e) }
 }
-
 export function getSiblingInput(element){
     let p = element.parentNode;
     let i = p.querySelector('SELECT') || p.querySelector('INPUT');
@@ -164,16 +169,29 @@ export function getSiblingInput(element){
     return subject;
   }
 
+/* https://stackoverflow.com/a/41015840/15781258
+ * usage :
+ *   const template = 'Hello ${var1}!';
+ *   const data     = { var1: 'world'};
+ *   const interpolated = template.interpolate(data);
+ */
+String.prototype.interpolate = function(params) {
+  const names = Object.keys(params);
+  const vals = Object.values(params);
+  return new Function(...names, `return \`${this}\`;`)(...vals);
+}
+
 /* Constants
    ---------
    uixType   // defines action keywords like accordion
    solidVar  // defines solid variables like solidLogo
 */
 export  const uixType = {
-    form: "action",
-    createResource: "action",
-    rss: "action",
     include: "action",
+    processcomponent:"action",
+    simpleform:"action",
+    form: "action",
+    rss: "action",
     togglevisibility: "action",
     dropdown: "action",
     editprofile: "action",
