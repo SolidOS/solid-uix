@@ -1,14 +1,14 @@
 {
   "name": "solid-uix",
   "version": "1.0.0",
-  "description": "build no-code apps with HTML UI components",
+  "description": "data-rich Solid components with little or no coding",
   "type": "module",
-  "main": "src/index.js",
+  "main": "src/index.html",
   "keywords": [],
   "author": "Jeff Zucker",
   "license": "MIT",
   "dependencies": {
-    "rdflib": "^2.2.31",
-    "solid-namespace": "^0.5.2"
+    "rdflib": "^2.2.32",
+    "solid-namespace": "^0.5.3"
   }
 }
