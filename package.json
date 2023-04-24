@@ -8,7 +8,9 @@
   "author": "Jeff Zucker",
   "license": "MIT",
   "dependencies": {
+    "marked": "^4.3.0",
     "rdflib": "^2.2.32",
-    "solid-namespace": "^0.5.3"
+    "solid-namespace": "^0.5.3",
+    "solid-ui": "^2.4.27"
   }
 }

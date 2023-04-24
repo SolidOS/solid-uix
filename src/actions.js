@@ -1,27 +1,54 @@
 import * as util from "./utils.js";
 import {fetchAndParse} from "./rss.js";
 
-export  async function processAction(element){
+export  async function processAction(element,elementToInit,specifiedSource){
     let action = element.dataset.uix.toLowerCase();
     let user = typeof UI != "undefined" ?UI.authn.currentUser() :null;
     let eventType = element.tagName==='SELECT' ?'change' :'click';
-    if(action==='rss'){
-      let so = (util.getSource(element)||{}).value ;
+    if(action.match(/^rss/)){
+      let isVideoFeed = action.match(/video/i)
+      let so = (util.getSource(element,elementToInit)||{}).value ;
       if(!so) return;
-      let output = await fetchAndParse( so );
-      if(output) await this.showInElement(element,output)
+      let output = await fetchAndParse( so, isVideoFeed );
+      if(isVideoFeed){
+        let link = output[0].link;
+        let vid = document.createElement('VIDEO');
+        vid.style.width="100%";
+        vid.setAttribute('controls',true);
+        vid.autoplay=1;
+        let source = document.createElement('SOURCE');
+        source.src = link;
+        source.type="video/mp4";   
+        vid.appendChild(source);
+        let button = document.createElement('BUTTON');
+        button.innerHTML =  `${output[0].label}<br>click to play`;
+        button.style.padding = "0.5rem";
+        button.style.opacity="60%";
+        button.addEventListener('click',()=>{
+          element.innerHTML="";
+          element.appendChild(vid)
+        });       
+        element.appendChild(button);
+      }
+      else { if(output) await this.showInElement(element,output) }
       return;
     }
     if(action==='include'){
+      return include(element,specifiedSource,this)
       try{
-        let r = await UI.store.fetcher.webOperation('GET',element.dataset.source);
+        let r = await UI.store.fetcher.webOperation('GET',util.getSource(element));
         if(r.ok){
-          element.innerHTML = r.responseText;
-          this.initVariables(element);
+          let tmp = document.createElement('SPAN');
+          tmp.innerHTML = r.responseText;
+          await this.initVariables(tmp);
+          element.appendChild(tmp);
         }
         else console.warn(r.message);
       }
       catch(e){ console.warn(e) }
+    }
+    if(action==='tabset'){
+      await this.template.tabset(element);
     }
     if(action==='quicknotes'){
 //      element.addEventListener('click',async (e)=>{
@@ -29,39 +56,26 @@ export  async function processAction(element){
 //      });
     }
     if(action==='accordion'){
-      for(let kid of element.childNodes){
-        if(kid.tagName==="UL"){
-          kid.style="list-style:none;margin-left:0;padding-left:0;";        
-          kid.classList.add('hidden');
-        }
-        else {
-         kid.style="padding:1rem;margin:0;border-bottom:1px solid #909090; background:#dddddd; cursor:pointer;display:grid;grid-template-columns=auto auto";
-         let html = kid.innerHTML;
-         kid.innerHTML = `<span>${html}</span><span style="display:inline-block;text-align:right;margin-top:-1.25rem;">&or;</span>`;
-          kid.addEventListener('click',async ()=>{
-          const selectedDropdown = kid.nextSibling.nextSibling;
-            let displays = element.querySelectorAll('UL');             
-            let kidHiddenNow = selectedDropdown.classList.contains('hidden');
-            for(let d of displays){
-              d.classList.add('hidden')
-            }
-            if(kidHiddenNow) selectedDropdown.classList.remove('hidden');
-            else selectedDropdown.classList.add('hidden');
-            let toDefer = selectedDropdown.dataset.defer;
-            let hasContent = selectedDropdown.innerHTML.length;
-            if(toDefer && !hasContent){
-              selectedDropdown.dataset.uix=toDefer;
-              let loading = document.createElement('P');
-              loading.innerHTML = "loading ...";
-              loading.style["margin-right"]="0.5rem";
-              selectedDropdown.appendChild(loading);
-              await this.process(selectedDropdown);
-              loading.style.display="none";
-            }
-          });
-        }
-      }
+       this.template.accordion(element);
     }
+/* 
+theses actions add eventListeners & do not return any output
+    go
+    toggleVisibility 
+    dropdown         (
+    editProfile      (solidOS link)
+    editPreferences  (solidOS link
+these return output
+   processComponent
+   rss
+   include
+move to templates
+    form
+    simpleForm
+    accordion
+move to plugins
+  quicknotes
+*/
     if(action==='go'){
       element.addEventListener('click',async(e)=> {
         e.preventDefault();
@@ -124,51 +138,35 @@ export  async function processAction(element){
       });
     }
     if(action==="form"){
-      return await processForm(element,this);
+      return await this.template.form(element,this);
     }
     if(action==="simpleform"){
-      return await fillSimpleForm(element,this);
+      return await this.template.simpleForm(element,this);
+    }
+    if(action==="tabdeck"){
+      return await this.template.tabdeck(element,this);
     }
     if(action==="createResource"){
       let fn = util.getSiblingInput(element)
 //      let success = util
     }
   }
-
-async function processForm(element,self){
-  let form = util.getIRInode(element.dataset.form);
-  let subjectString = element.dataset.subject;
-  let subjectVal = (util.getNodeFromFieldValue(subjectString)||{}).value ;  
-  let subject = util.getIRInode( subjectString );  
-  if(!form || !subject) return;
-  const formElement = await self.showForm({form,subject});
-  if(formElement) element.appendChild(formElement);
-}
-
-async function fillSimpleForm(element,self){
-  let node = util.getSource(element);
-  let subject = node ?node.value :null;
-  if(!subject) return;
-  await util.load(node.doc());
-  for(let field of element.querySelectorAll('INPUT')){
-    if(field.type.match(/text/i)){
-      let predicate = util.curie(field.dataset.fieldname);
-      field.value = (util.any(node,predicate)||{}).value || "";
-      field.dataset.originalvalue = field.value;
-    }
-    else if(field.type.match(/radio/i)){
-      let predicate = util.curie(field.name);
-      let wanted = util.any(node,predicate);
-      for(let i of document.querySelectorAll(`*[name="${field.name}"]`)){
-        if(util.curie(i.value).value===wanted.value) i.checked=true;
+async function include(element,source,self){
+      source ||= util.getSource(element);
+      try{
+        let r = await UI.store.fetcher.webOperation('GET',source);
+        if(r.ok){
+          let tmp = document.createElement('SPAN');
+          let content = r.responseText;
+          tmp.innerHTML = content;
+          await self.initVariables(tmp);
+          element.appendChild(tmp);
+        }
+        else console.warn(r.message);
       }
-    }
-  }
-  for(let field of element.querySelectorAll('TEXTAREA')){
-    let predicate = util.curie(field.dataset.fieldname);
-    field.innerHTML = (util.any(node,predicate)||{}).value || "";
-  }
+      catch(e){ console.warn(e) }
 }
+
 async function processComponent(element){
   let harvested = [];
   let source = document.getElementById(element.dataset.source.replace(/^#/,''));

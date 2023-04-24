@@ -229,6 +229,10 @@ async function constructContext(webidString,self){
     }
     catch(e){ return console.warn(`load failed for '${url}': ${e}.`); }
   }
+export async function nostoreFetch(url){
+//    if(!url) return console.warn("No URL supplied to tryLoad().");
+//    return await store.fetcher._fetch(url);
+}
 async function _findWebid(webid){
     webid = webid || await localWebId();
     try {  return util.sym(webid);  }

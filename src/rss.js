@@ -1,4 +1,4 @@
-export async function fetchAndParse(feedUri){
+export async function fetchAndParse(feedUri,isVideoFeed){
 
   // fetch feed URI & load it into a DOM structure
   //
@@ -16,6 +16,10 @@ export async function fetchAndParse(feedUri){
   // find items (RSS) or entries (Atom)
   //
   let items = feedDom.querySelectorAll("item") || null;
+  let thumbnail;
+  if(isVideoFeed){
+     thumbnail = feedDom.querySelector("channel").querySelector("title").innerHTML;
+  }
   items = items.length<1 ?feedDom.querySelectorAll("entry") :items;
 
   //
@@ -43,6 +47,11 @@ export async function fetchAndParse(feedUri){
     let label = el.querySelector("title").innerHTML;
     label = label.replace(/^\<\!\[CDATA\[/,'');
     label = label.replace(/\]\].*\>/,'').trim();
+
+    if(isVideoFeed){
+      link = el.querySelector('enclosure').getAttribute('url');  
+      label= thumbnail;
+    }
 
     parsedItems.push({label,link});
   });

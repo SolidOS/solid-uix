@@ -10,7 +10,7 @@ import * as util from './utils.js';
   showProperties
   showInElement
 */
-
+/*
 export async function showProperties(element){
   element.innerHTML="";
   let subjectNode = util.getSource(element);
@@ -43,15 +43,36 @@ export async function showProperties(element){
   if(counter>1) element.appendChild(table);
   else element.innerText = lastFound;
 }
-
+*/
 export async function show(uri,element){
   let linktype = element.dataset.linktype
   let needsproxy = element.dataset.needsproxy || linktype==='rss';
   if(needsproxy) uri = this.proxy+uri;
-  if(!linktype){
+  if(!linktype  && element.datset && element.dataset.uix){
     if(element.dataset.uix.toLowerCase().match(/^(user|profileowner|edit)/)) linktype='SolidOS'
   }
   if(linktype==="SolidOS") return this.showSolidOSLink(uri,element,this);
+  else if( uri.match(/\.(md|marked)$/) ){                    // parse markdown then insert into element
+    await import('/public/s/solid-uix/node_modules/marked/marked.min.js');
+    let content =  await myload(uri) ; 
+    if(content) element.innerHTML= marked.parse( content ); 
+    return;
+  }
+  else if( uri.match(/\.(txt)$/) ){                       // show text/plain inside pre tags
+    let content =  await myload(uri) ; 
+    if(content) element.innerHTML = `<pre>${content.replace(/</g,'&lt;')}</pre>`; 
+    return;
+  }
+  else {                                                     // include document in element, process it's uix-vars
+    element.innerHTML=""; 
+    element.dataset.uix="include";
+    this.processAction(element,element,uri);
+  }
+  // self.query.properties2table(div,subject)                // display properties 
+  const el = document.createElement('IFRAME');
+  el.style="width:100%;height:100%;border:none;overflow:auto;";
+//  element.appendChild(el);
+alert(3)
   let content;
   try {
     if(uri.match(/https:\/\/github.com/)) {
@@ -66,8 +87,8 @@ export async function show(uri,element){
     if(needsproxy) uri = uri.replace(/^.*proxy\?uri=/,'');
     uri = new URL(uri);
     const b = uri ?`<base href="${uri.origin}${uri.pathname}">` :"";
-    element.srcdoc = `<body>${b}${content}</body>`;
-    element.scrollTo({ top: 0, behavior: "smooth" });
+    el.srcdoc = `<body>${b}${content}</body>`;
+    el.scrollTo({ top: 0, behavior: "smooth" });
   }
   catch(e){ alert(uri+e); return; }
 }
@@ -76,45 +97,26 @@ async function _gitApiFetch(uri){
   uri = uri.replace(/blob\/main\//,'contents');
   const options = {Accept: "application/vnd.github.v3+html"};
   let response = await fetch(uri,options);
-  console.log(await response.text() );
   return await response.text() ;
   //  let json = await response.json();
   //  return atob(json.content);
 }     
-
-
-/**
-    @param {IRI} form - required: form location
-    @param {IRI} subject - required: data location
-    @param {String?} formString - optional in-memory form
-    @param {IRI?} formResultsDocument - optional location for form data (defaults to formSubject)
-    @param {HTMLElement?} container - optional HTML element, defaults to new DIV;
-    @param {HTMLDOM?} dom - optional dom, defaults to document;
-    @return {HTMLElement}
- */
-export async function showForm(o){
-    const dom = o.dom || document;
-    const container = o.container || document.createElement("DIV");
-    let form = UI.rdf.sym(o.form);
-    let doc = o.formResultDocument;
-    let formFromString = o.formString;
-    let subject = o.subject;
-    let script = o.script || function(){};
-    try {
-      subject = UI.rdf.sym(subject) ;
-      if(o.formString){
-        UI.rdf.parse(o.formString,UI.store,o.form,'text/turtle');
-      }
-      else await UI.store.fetcher.load(form);
-      await UI.store.fetcher.load(subject.doc());
-      await UI.widgets.appendForm(dom, container, {}, subject, form, doc, script);
-    }
-    catch(e){
-       console.log(e);
-       container.innerHTML = "FORM ERROR:"+e;
-    }  
-    return container;
+async function myload(url){
+  if(url.match(/github/)) {
+    return await _gitApiFetch(url);
   }
+  try{
+        let r = await UI.store.fetcher.webOperation('GET',url);
+        if(r.ok){
+          let content = r.responseText;
+          return content;
+        }
+        else console.warn(r.message);
+      }
+      catch(e){ console.warn(e) }
+}
+
+
 
 function aoh2table(table,aoh){
   let fields = Object.keys(aoh[0]);
@@ -149,13 +151,17 @@ function aoh2table(table,aoh){
 }
 const isBuiltInTemplate = {
   "tabset":1,
+  "rolodex":1,
 }
 //import {tabset} from './templates/tabset.js';
 function showBuiltInTemplate(template,element,results,self){
   template=template.toLowerCase();
   switch(template){
     case "tabset" :
-      self.tabset(element,results);
+      self.template.tabset(element,results);
+      break;  
+    case "rolodex" :
+      self.template.rolodex(element,results);
       break;  
   }
 }
@@ -163,10 +169,16 @@ function showBuiltInTemplate(template,element,results,self){
 function showTemplate(element,results,self){
   let template = element.dataset.template;
   if(!template) return results;
-  if(isBuiltInTemplate[template.toLowerCase()]){
+  if(self.template[template.toLowerCase()]){
+    (self.template[template.toLowerCase()])(element,results)
+    return;
+  }
+/*
+  if(isBuiltInTemplate[
      showBuiltInTemplate(template,element,results,self);
      return;
   }
+*/
   for(let row of results){
      element.innerHTML += element.dataset.template.interpolate(row);
   }

@@ -144,19 +144,21 @@ export function getIRInode(url){
    getNodeFromFieldValue(elementID) // returns node of the value of a named input/select element
    getSiblingInput(element)        // returns string value of a sibling input/select element
 */
-export function getSource(element){
+export function getSource(element,elementToInit){
   let source = element.dataset.from;
   if(!source && element.parentNode && element.parentNode.dataset) source =element.parentNode.dataset.from;
   if(!source) return;
-  if(source.startsWith('#')) return getNodeFromFieldValue(source);
+  if(source.startsWith('#')) return getNodeFromFieldValue(source,elementToInit);
   else return getIRInode(source);
 }
-export function getNodeFromFieldValue(fieldSelector){
+export function getNodeFromFieldValue(fieldSelector,elementToInit){
+   elementToInit ||= document;
    if(!fieldSelector) return;
-   let paramField = document.getElementById( fieldSelector.replace(/^#/,'') );
+   let paramField = elementToInit.querySelector(fieldSelector);
    if(!paramField ) return;
    let index = paramField.selectedIndex;
    if(typeof index==="undefined" || index<0) index=0;
+   index ||=0;
    let param = paramField[index]; // SELECT
    if(!param ) return;
    try { return sym(param.value); }
@@ -164,6 +166,7 @@ export function getNodeFromFieldValue(fieldSelector){
 }
 export function getSiblingInput(element){
     let p = element.parentNode;
+    if(!p) return
     let i = p.querySelector('SELECT') || p.querySelector('INPUT');
     subject = i.value;                             
     return subject;
@@ -188,10 +191,13 @@ String.prototype.interpolate = function(params) {
 */
 export  const uixType = {
     include: "action",
+    tabset: "action",
+    tabdeck: "action",
     processcomponent:"action",
     simpleform:"action",
     form: "action",
     rss: "action",
+    rssvideo: "action",
     togglevisibility: "action",
     dropdown: "action",
     editprofile: "action",

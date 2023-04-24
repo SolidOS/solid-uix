@@ -64,7 +64,7 @@ export async function processPlugin(pluginName,element){
   }
   pluginContainer ||= this.plugins[pluginName];
   if(pluginName==='quicknotes'){
-    let form =  await this.showForm({
+    let form =  await this.template.form({
       form: `${pluginContainer}assets/quicknotes.ttl#Form`,
       formSubject: `${pluginContainer}assets/quicknotes.ttl#Data`,
     });
