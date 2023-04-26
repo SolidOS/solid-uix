@@ -7,10 +7,25 @@
   "keywords": [],
   "author": "Jeff Zucker",
   "license": "MIT",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "engines": {
+    "node": "18.15.0"
+  },
   "dependencies": {
     "marked": "^4.3.0",
     "rdflib": "^2.2.32",
     "solid-namespace": "^0.5.3",
     "solid-ui": "^2.4.27"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.21.4",
+    "babel-jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0"
   }
 }
