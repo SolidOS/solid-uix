@@ -6,7 +6,11 @@ The Solid UIX framework supports low and no-code building of Solid apps and webs
 
 Please see this demo, a [complete reimagining of the SolidOS frontend](https://solidos.github.io/solid-uix/index.html) for an example app built entirely with Solid UIX.
 
-## Basic Usage
+**NOTE :** I am currently converting this whole library to use standard web-components so the docs below will soon be outdated.  New code and docs coming soon!
+
+
+
+## Basic Usage (old docs)
 
 A Solid UIX variable can be applied to any HTML tag like so:
 
